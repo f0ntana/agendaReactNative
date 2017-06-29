@@ -33,14 +33,23 @@ export default class AgendaScreen extends Component {
     };
   }
 
+  refreshComponent() {
+    this.setState({
+      items: {}
+    }, () => {
+      this._fetchData()
+    })
+  }
+
   componentDidMount() {
-    this.props.navigation.addListener('focus', this._fetchData);
-    this.props.navigation.addListener('blur', this._fetchData);
+    this.props.navigation.addListener('focus', () => {
+      this.refreshComponent();
+    });
   }
 
   componentWillUnmount() {
-    this.props.navigation.removeListener('focus', this._fetchData);
-    this.props.navigation.removeListener('blur', this._fetchData);
+    // remover o listener?!
+    // this.props.navigation.removeListener('focus', this._fetchData);
   }
 
   _fetchData = () => {

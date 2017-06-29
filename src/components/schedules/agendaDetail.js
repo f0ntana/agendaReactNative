@@ -24,7 +24,7 @@ export default class AgendaDetail extends Component {
         API.changeFinished(scheduleId)
         .then(response => response.json())
         .then(response => {
-            this.setState((params) => ({ params: response }))
+            this.setState({ params: response.data})
         })
     }
 
@@ -32,7 +32,7 @@ export default class AgendaDetail extends Component {
         API.changeOwnerPresent(scheduleId)
         .then(response => response.json())
         .then(response => {
-            this.setState((params) => ({ params: response }))
+            this.setState({ params: response.data })
         })
     }
 
