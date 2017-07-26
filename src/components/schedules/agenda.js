@@ -13,7 +13,7 @@ import { Agenda, LocaleConfig } from 'react-native-calendars';
 const NOW = Date.now();
 
 LocaleConfig.locales['pt_BR'] = {
-  monthNames: [ 'Janeiro', 'Fevereiro', 'Março', 'April', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'April', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
   monthNamesShort: ['Jan.','Fev.','Mar','Abr','Mai','Jun','Jul.','Ago','Set.','Out.','Nov.','Dez.'],
   dayNames: [ 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
   dayNamesShort: ['Dom.','Seg.','Ter.','Qua.','Qui.','Sex.','Sab.']
@@ -23,7 +23,7 @@ LocaleConfig.defaultLocale = 'pt_BR';
 
 export default class AgendaScreen extends Component {
   static navigationOptions = {
-    title: 'Agenda',
+      tabBarLabel: 'Agenda',
   }
 
   constructor(props) {
@@ -48,23 +48,15 @@ export default class AgendaScreen extends Component {
   }
 
   componentWillUnmount() {
-    // remover o listener?!
-    // this.props.navigation.removeListener('focus', this._fetchData);
+    this.props.navigation.removeListener('focus', this._fetchData);
   }
 
   _fetchData = () => {
     API.getSchedulesUser()
     .then(response => response.json())
     .then(response => {
-      
-      const newItems = {};
-      
-      Object.keys(response).forEach(key => {
-        newItems[key] = response[key];
-      });
-      
       this.setState({
-        items: newItems
+        items: response
       });
     })
   };
@@ -86,28 +78,16 @@ export default class AgendaScreen extends Component {
     API.getSchedulesUser()
     .then(response => response.json())
     .then(response => {
-      
-      const newItems = {};
-      
-      Object.keys(response).forEach(key => {
-        newItems[key] = response[key];
-      });
-      
+      console.log(response)
       this.setState({
-        items: newItems
-      });
-
+        items: response
+      })
     })
   }
 
-
   renderAgendaDetail(item) {
     const { navigate } = this.props.navigation;
-    navigate(
-      'AgendaDetail', item, {
-        onGoBack: () => console.log('Will go back from nextComponent'),
-      }
-    );
+    navigate('AgendaDetail', item);
   }
 
   renderItem(item) {

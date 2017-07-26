@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import { View, Text , StyleSheet, Dimensions } from 'react-native'
-import { Card, Badge } from 'react-native-elements'
+import { Card, Badge, Button } from 'react-native-elements'
 
 import { API } from '../../utils/api';
 
 var width = Dimensions.get('window').width - 20
 
 export default class AgendaDetail extends Component {
-    
     static navigationOptions = {
         title: 'Detalhe Agenda',
     }
@@ -18,7 +17,6 @@ export default class AgendaDetail extends Component {
             params: this.props.navigation.state.params
         }
     }
-
 
     changeFinished(scheduleId) {
         API.changeFinished(scheduleId)
@@ -46,12 +44,16 @@ export default class AgendaDetail extends Component {
                         <Text style={ styles.item }>Dono presente:</Text>
                     </View>
                     <View style={ styles.items }>
-                        <Badge containerStyle={ this.state.params.finished ? styles.badgeTrue : styles.badge } onPress={() => this.changeFinished(this.state.params.id)}>
-                            <Text style={ styles.itemBadge }>{ this.state.params.finished ? 'Sim' : 'Não' }</Text>
-                        </Badge>
-                        <Badge containerStyle={ this.state.params.owner_present ? styles.badgeTrue : styles.badge } onPress={() => this.changeOwnerPresent(this.state.params.id)}>
-                            <Text style={ styles.itemBadge }>{ this.state.params.owner_present ? 'Sim' : 'Não' }</Text>
-                        </Badge>
+                        <Button
+                            buttonStyle={ this.state.params.finished ? styles.badgeTrue : styles.badge } 
+                            onPress={() => this.changeFinished(this.state.params.id)}
+                            title={ this.state.params.finished ? 'Sim' : 'Não' } >
+                        </Button>
+                        <Button
+                            buttonStyle={ this.state.params.owner_present ? styles.badgeTrue : styles.badge } 
+                            onPress={() => this.changeOwnerPresent(this.state.params.id)}
+                            title={ this.state.params.owner_present ? 'Sim' : 'Não' } >
+                        </Button>
                     </View>
                 </Card>
             </View>
@@ -74,9 +76,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     badge: {
+        borderRadius: 10,
         backgroundColor: 'gray',
     },
     badgeTrue: {
+        borderRadius: 10,
         backgroundColor: 'green',
     },
     itemBadge: {
