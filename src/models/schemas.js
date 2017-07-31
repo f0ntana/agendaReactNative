@@ -1,23 +1,15 @@
 import Realm from 'realm'
 
-const Place = {
-	name: 'Place',
-  	properties: {
-  		name: 'string'
-  	}
-}
+import Schedule from './schedule'
+import Crop from './crop'
+import Cultivar from './cultivar'
+import Place from './place'
 
-const Client = {
-	name: 'Client',
-  	properties: {
-  		name: 'string'
-  	}
-}
-
-export const realm = new Realm({
+export default new Realm ({ 
 	schema: [
-		Place,
-		Client
-	]
+		Schedule,
+		Crop,
+		Cultivar,
+		Place
+	] 
 })
-

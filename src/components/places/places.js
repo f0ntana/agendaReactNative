@@ -1,10 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, NetInfo } from 'react-native'
-import { List, ListItem } from 'react-native-elements'
-
-import { realm } from '../../models/schemas'
-
-let list = realm.objects('Place');
+import { List, ListItem, Icon } from 'react-native-elements'
 
 NetInfo.isConnected.fetch().then(isConnected => {
 	console.log('First, is ' + (isConnected ? 'online' : 'offline'));
@@ -22,10 +18,6 @@ NetInfo.isConnected.addEventListener(
 );
 
 export default class Places extends Component {
-	static navigationOptions = {
-	    tabBarLabel: 'Fazendas',
-	}
-
  	render() {
 	   	return (
 	     	<View style={styles.container}>
@@ -42,6 +34,24 @@ export default class Places extends Component {
 	     	</View>
 	   	)
 	}
+}
+
+Places.navigationOptions = {
+  drawerLabel: 'Fazendas',
+  drawerIcon: ({ tintColor }) => (
+    <Icon
+      name="leaf"
+      size={30}
+      style={{
+        width: 50,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      type="material-community"
+      color={tintColor}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
