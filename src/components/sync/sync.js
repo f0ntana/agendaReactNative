@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
+import { StackNavigator } from 'react-navigation'
 import { Icon } from 'react-native-elements'
+import moment from 'moment'
 
 import { API } from '../../utils/api'
 import realm from '../../models/schemas'
@@ -15,12 +17,11 @@ function saveSchedules(items) {
 				id: item.id,
 				place_id: item.place_id,
 				name: item.name,
-				date: new Date(item.date),
+				date: moment(item.date).toDate(),
 				description: item.description,
 				owner_present: item.owner_present ? true : false,
 				finished: item.finished ? true : false,
 			})
-			console.log(schedule.id)
 		})
 		resolve()
 	})
@@ -37,7 +38,6 @@ function saveCrops(items) {
 				id: item.id,
 				name: item.name
 			})
-			console.log(crop.id)
 		})
 		resolve()
 	})
@@ -56,7 +56,6 @@ function saveCultivars(items) {
                 cycle: item.cycle ? item.cycle : '0',
                 transgenic: item.transgenic ? true : false
             })
-            console.log(cultivar.id)
         })
         resolve()
     })
@@ -82,8 +81,8 @@ function savePlaces(items) {
 			    city: item.city.name,
 			    state: item.city.state.slug,
 			    productivity: item.plot.production.productivity,
-			    planting_date: new Date(item.plot.production.planting_date),
-			    harvest_date: new Date(item.plot.production.harvest_date),
+			    planting_date: moment(item.plot.production.planting_date).toDate(),
+			    harvest_date: moment(item.plot.production.harvest_date).toDate(),
 			    population: item.plot.production.population,
 			    spacing: item.plot.production.spacing,
 			    fertility: item.plot.production.fertility,
@@ -95,7 +94,6 @@ function savePlaces(items) {
 			    depth_gathering: item.plot.production.depth_gathering,
 			    desiccation: item.plot.production.desiccation ? true : false
 			})
-			console.log(place.id)
 		})
 		resolve()
 	})
@@ -103,11 +101,12 @@ function savePlaces(items) {
 }
 
 
-export default class Sync extends Component {
+class SyncView extends Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
+			isUpdateSchedules: false,
 			isSchedulesInSync: false,
 			isCropsInSync: false,
 			isCultivarsInSync: false,
@@ -115,30 +114,38 @@ export default class Sync extends Component {
 		}
 	}
 
-	componentDidMount() {
-		console.log('componentDidMount')
-		API.getSync()
+	async componentDidMount() {
+		console.log('Start Update')
+		let places = realm.objects('Place')
+		let items = places.reduce( (acc, x) => {
+			acc[x.id] = x
+			return acc
+		}, {})
+		await API.updateSync(items)
 		.then(response => response.json())
 		.then(response => {
+			console.log('response', response)
+			// if(response.success){
+				this.setState({ isUpdateSchedules: true })	
+			// }
+		})
+
+		console.log('Start Get')
+		await API.getSync()
+		.then(response => response.json())
+		.then(response => {
+			console.log(response)
 			realm.write(() => {
-				console.log('Iniciando Agenda')
 				saveSchedules(response.schedules).then( () => {
-					console.log('Promise Agenda')
 		            this.setState({ isSchedulesInSync: true })
 		        })
-				console.log('Iniciando Safras')
 				saveCrops(response.crops).then( () => {
-					console.log('Promise Safras')
 		            this.setState({ isCropsInSync: true })
 		        })
-				console.log('Iniciando Cultivars')
 				saveCultivars(response.cultivars).then( () => {
-					console.log('Promise Cultivars')
 		            this.setState({ isCultivarsInSync: true })
 		        })
-				console.log('Iniciando Fazendas')
 				savePlaces(response.places).then( () => {
-					console.log('Promise Fazendas')
 		            this.setState({ isPlacesInSync: true })
 		        })
 			})
@@ -149,6 +156,7 @@ export default class Sync extends Component {
 		return (
 			<View style={styles.container}>
 				<Text>Sincronização:</Text>
+				<Text>Update: {this.state.isUpdateSchedules ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Agenda: {this.state.isSchedulesInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Safras: {this.state.isCropsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Cultivars: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>
@@ -158,22 +166,41 @@ export default class Sync extends Component {
 	} 
 }
 
+const Sync = StackNavigator({
+  	SyncView: {
+	    screen: SyncView,
+	    path: '/',
+	    navigationOptions: ({ navigation }) => ({
+		    title: 'SINCRONIZAÇÃO',
+		    headerLeft: (
+		        <Icon
+		          	name="menu"
+		          	size={30}
+		          	type="entypo"
+		          	style={{ paddingLeft: 10 }}
+		          	onPress={() => navigation.navigate('DrawerOpen')}
+		        />
+		    )
+	    }),
+  	}
+})
+
 Sync.navigationOptions = {
-  drawerLabel: 'Sincronizar',
-  drawerIcon: ({ tintColor }) => (
-    <Icon
-      name="refresh"
-      size={30}
-      style={{
-        width: 50,
-        height: 50,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      type="material-community"
-      color={tintColor}
-    />
-  )
+  	drawerLabel: 'Sincronizar',
+  	drawerIcon: ({ tintColor }) => (
+	    <Icon
+	      	name="refresh"
+	      	size={30}
+	      	style={{
+	        	width: 50,
+	        	height: 50,
+	        	alignItems: 'center',
+	        	justifyContent: 'center',
+	      	}}
+	      	type="material-community"
+	      	color={tintColor}
+	    />
+  	)
 }
 
 const styles = StyleSheet.create({
@@ -183,3 +210,5 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	}
 })
+
+export default Sync

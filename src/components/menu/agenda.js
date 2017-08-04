@@ -20,7 +20,7 @@ const Agenda = StackNavigator({
     screen: AgendaView,
     path: '/',
     navigationOptions: ({ navigation }) => ({
-      title: 'Agenda',
+      title: 'AGENDA',
       headerLeft: (
         <Icon
           name="menu"
@@ -36,7 +36,7 @@ const Agenda = StackNavigator({
     screen: AgendaDetailsView,
     path: '/agenda_detail',
     navigationOptions: {
-      title: 'Agenda Detalhe',
+      title: 'AGENDA DETALHE',
     },
   },
 })
@@ -59,4 +59,4 @@ AgendaView.navigationOptions = {
   )
 }
 
-export default Agenda;
+export default Agenda

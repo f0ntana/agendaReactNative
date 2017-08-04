@@ -34,16 +34,6 @@ class AgendaHome extends Component {
 		})
 	}
 
-	// componentDidMount() {
-	// 	this.props.navigation.addListener('focus', () => {
-	// 		this.refreshComponent();
-	// 	});
-	// }
-
-	// componentWillUnmount() {
-	// 	this.props.navigation.removeListener('focus', this._fetchData);
-	// }
-
 	_fetchData = () => {
 		API.getSchedulesUser()
 		.then(response => response.json())
@@ -76,8 +66,6 @@ class AgendaHome extends Component {
 			return date
 		})
 
-		console.log(grouped)
-		
 		this.setState({
 			items: grouped
 		})

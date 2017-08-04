@@ -45,7 +45,7 @@ const MainRoot = DrawerNavigator(
 		}
 	},
 	{
-		initialRouteName: 'Sync',
+		initialRouteName: 'Login',
 		contentOptions: {
 			activeTintColor: '#548ff7',
 			activeBackgroundColor: 'transparent',

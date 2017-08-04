@@ -37,7 +37,6 @@ let objCrop = crops.reduce((acc,row) => {
 var Crop = t.enums(objCrop, "Crop")
 
 let cultivars = realm.objects('Cultivar')
-console.log('cultivars', cultivars.length)
 let objCultivar = cultivars.reduce((acc,row) => {
     acc[row.id] = row.name
     return acc
@@ -87,34 +86,78 @@ let formOptions = {
 export default class AgendaDetail extends Component {
 	constructor(props) {
         super(props)
+
+        setTimeout(1000)
+        var place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
         this.state = {
-            params: this.props.navigation.state.params,
+            schedule: this.props.navigation.state.params,
+            params: place,
+            latitude: null,
+            longitude: null,
+            error: null,
             initialvalue: {
-                // crop_id: this.props.navigation.state.params.place.plot.production.crop_id,
-                // cultivar_id: this.props.navigation.state.params.place.plot.production.cultivar_id,
-                // productivity: this.props.navigation.state.params.place.plot.production.productivity,
-                // population: this.props.navigation.state.params.place.plot.production.population,
-                // spacing: this.props.navigation.state.params.place.plot.production.spacing,
-                // fertility: this.props.navigation.state.params.place.plot.production.fertility,
-                // argil: this.props.navigation.state.params.place.plot.production.argil,
-                // mo: this.props.navigation.state.params.place.plot.production.mo,
-                // p: this.props.navigation.state.params.place.plot.production.p,
-                // k: this.props.navigation.state.params.place.plot.production.k,
-                // v: this.props.navigation.state.params.place.plot.production.v,
-                // depth_gathering: this.props.navigation.state.params.place.plot.production.depth_gathering,
-                // desiccation: this.props.navigation.state.params.place.plot.production.desiccation ? true : false,
-                // owner_present: this.props.navigation.state.params.owner_present ? true : false,
-                // harvest_date: new Date(moment(this.props.navigation.state.params.place.plot.production.harvest_date).valueOf()),
-                // planting_date: new Date(moment(this.props.navigation.state.params.place.plot.production.planting_date).valueOf()),
+                crop_id: place.crop_id,
+                cultivar_id: place.cultivar_id,
+                productivity: place.productivity,
+                population: place.population,
+                spacing: place.spacing,
+                fertility: place.fertility,
+                argil: place.argil,
+                mo: place.mo,
+                p: place.p,
+                k: place.k,
+                v: place.v,
+                depth_gathering: place.depth_gathering,
+                desiccation: place.desiccation,
+                owner_present: this.props.navigation.state.params.owner_present,
+                harvest_date: new Date(moment(place.harvest_date).valueOf()),
+                planting_date: new Date(moment(place.planting_date).valueOf()),
             }
         }
+        console.log(this.state.params)
     }
 
     saveChanges() {
         var value = this.refs.form.getValue()
-        if (value) { 
-          console.log(value)
+        if (value) {
+            console.log(value)
+            realm.write(() => {
+                let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
+                schedule.owner_present = value.owner_present
+
+                let place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
+                place.crop_id = parseInt(value.crop_id)
+                place.cultivar_id = parseInt(value.cultivar_id)
+                place.productivity = value.productivity
+                place.population = value.population
+                place.spacing = value.spacing
+                place.fertility = value.fertility.toString()
+                place.argil = value.argil
+                place.mo = value.mo
+                place.p = value.p
+                place.k = value.k
+                place.v = value.v
+                place.depth_gathering = value.depth_gathering
+                place.desiccation = value.desiccation
+                place.harvest_date = value.harvest_date
+                place.planting_date = value.planting_date
+            })
+            alert('Salvo com sucesso')
         }
+    }
+
+    componentDidMount() {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.setState({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    error: null,
+                })
+            },
+            (error) => this.setState({ error: error.message }),
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+        )
     }
 
   	render() {
@@ -124,23 +167,31 @@ export default class AgendaDetail extends Component {
             <ScrollView style={styles.container}>
                 <Card title={ this.state.params.name }>
                 	<View style={styles.title}>
-                		<Text style={styles.titleText}>
-                			DESCRIÇÃO VISITA
-                		</Text>
+                        <Text style={styles.titleText}>
+                            DESCRIÇÃO VISITA
+                        </Text>
+                    </View>
+                    <View style={styles.title}>
+                		<Text>Latitude: {this.state.latitude}</Text>
+                        <Text>Longitude: {this.state.longitude}</Text>
+                        {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
                 	</View>
                 	<View style={styles.infos}>
                 		<Text style={styles.infosText}>
-	                    	<Text style={{ fontWeight: 'bold' }}>Cliente: </Text>
+	                    	<Text style={{ fontWeight: 'bold' }}>Cliente: </Text> {this.state.params.client_name}
 	                    </Text>
                 		<Text style={styles.infosText}>
-	                    	<Text style={{ fontWeight: 'bold' }}>Fazenda: </Text>
+	                    	<Text style={{ fontWeight: 'bold' }}>Fazenda: </Text> {this.state.params.name}
 	                    </Text>
                 		<Text style={styles.infosText}>
-                			<Text style={{ fontWeight: 'bold' }}>Endereço: </Text>
+                			<Text style={{ fontWeight: 'bold' }}>Endereço: </Text> {this.state.params.address}
                 		</Text>
                 		<Text style={styles.infosText}>
-                			<Text style={{ fontWeight: 'bold' }}>Intinerário: </Text>
+                			<Text style={{ fontWeight: 'bold' }}>Intinerário: </Text> {this.state.params.itinerary}
                 		</Text>
+                        <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Cidade/UF: </Text> {this.state.params.city} - {this.state.params.state}
+                        </Text>
                 	</View>
                 	<View style={styles.infos}>
                         <Form

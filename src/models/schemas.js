@@ -5,7 +5,7 @@ import Crop from './crop'
 import Cultivar from './cultivar'
 import Place from './place'
 
-export default new Realm ({ 
+const schemas = new Realm ({ 
 	schema: [
 		Schedule,
 		Crop,
@@ -13,3 +13,5 @@ export default new Realm ({
 		Place
 	] 
 })
+
+export default schemas

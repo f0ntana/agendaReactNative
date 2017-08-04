@@ -1,24 +1,45 @@
-const API_BASE = 'http://localhost:8000/api/'
+import { AsyncStorage } from 'react-native'
 
-const TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9hcGkvbG9naW4iLCJpYXQiOjE1MDE0NzcwMDEsImV4cCI6MTUwMTgzNzAwMSwibmJmIjoxNTAxNDc3MDAxLCJqdGkiOiJkTFV6RVRkRDZzcGNtc2E5In0.aqOl4hrw9AA4W2CCWMmpLut5sry-Ip_XHVkWxWmxvos'
+const API_BASE = 'http://petrovina-crm.softsul.agr.br/api/'
 
 export const API = {
-    getSchedulesUser() {
-        return fetch(API_BASE + 'schedules/3', {
-            method: 'get',
-            headers: {
-                'Authorization': 'Bearer ' + TOKEN,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            }
+
+    updateSync(payload) {
+        let data = JSON.stringify( payload )
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-update', {
+                method: 'post',
+                body: data,
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
         })
+        return response
     },
 
     getSync() {
-        return fetch(API_BASE + 'schedule-sync/3', {
-            method: 'get',
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+    postLogin(payload) {
+        let data = JSON.stringify( payload )
+        return fetch(API_BASE + 'login', {
+            method: 'post',
+            body: data,
             headers: {
-                'Authorization': 'Bearer ' + TOKEN,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
