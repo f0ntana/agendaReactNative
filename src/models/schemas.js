@@ -5,7 +5,7 @@ import Crop from './crop'
 import Cultivar from './cultivar'
 import Place from './place'
 
-const schemas = new Realm ({ 
+const schemas = new Realm({ 
 	schema: [
 		Schedule,
 		Crop,

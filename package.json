@@ -13,6 +13,7 @@
 		"react-native": "0.45.1",
 		"react-native-calendars": "^1.5.6",
 		"react-native-elements": "^0.13.0",
+		"react-native-keyboard-aware-scroll-view": "^0.2.9",
 		"react-native-tab-view": "0.0.67",
 		"react-native-vector-icons": "^4.3.0",
 		"react-navigation": "git+https://github.com/martnu/react-navigation.git#pass-down-drawer-lock-mode",

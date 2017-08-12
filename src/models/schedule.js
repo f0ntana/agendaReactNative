@@ -9,5 +9,10 @@ Schedule.schema = {
 		description: 'string',
 		owner_present: 'bool',
 		finished: 'bool',
+		start_travel: 'bool',
+		startLat: 'string',
+		startLong: 'string',
+		endLat: 'string',
+		endLong: 'string',
 	}
 }

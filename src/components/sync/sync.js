@@ -21,6 +21,11 @@ function saveSchedules(items) {
 				description: item.description,
 				owner_present: item.owner_present ? true : false,
 				finished: item.finished ? true : false,
+				start_travel: item.start_travel ? true : false,
+				startLat: item.startLat ? item.startLat : '',
+				startLong: item.startLong ? item.startLong : '',
+				endLat: item.endLat ? item.endLat : '',
+				endLong: item.endLong ? item.endLon : '',
 			})
 		})
 		resolve()
@@ -106,6 +111,7 @@ class SyncView extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			isUpdatePlaces: false,
 			isUpdateSchedules: false,
 			isSchedulesInSync: false,
 			isCropsInSync: false,
@@ -115,7 +121,22 @@ class SyncView extends Component {
 	}
 
 	async componentDidMount() {
-		console.log('Start Update')
+		console.log('Start Update Schedule')
+		let schedules = realm.objects('Schedule')
+		let itemsSchedules = schedules.reduce( (acc, x) => {
+			acc[x.id] = x
+			return acc
+		}, {})
+		await API.updateSyncSchedules(itemsSchedules)
+		.then(response => response.json())
+		.then(response => {
+			console.log('response', response)
+			// if(response.success){
+				this.setState({ isUpdateSchedules: true })	
+			// }
+		})
+
+		console.log('Start Update Place')
 		let places = realm.objects('Place')
 		let items = places.reduce( (acc, x) => {
 			acc[x.id] = x
@@ -126,7 +147,7 @@ class SyncView extends Component {
 		.then(response => {
 			console.log('response', response)
 			// if(response.success){
-				this.setState({ isUpdateSchedules: true })	
+				this.setState({ isUpdatePlaces: true })	
 			// }
 		})
 
@@ -156,7 +177,8 @@ class SyncView extends Component {
 		return (
 			<View style={styles.container}>
 				<Text>Sincronização:</Text>
-				<Text>Update: {this.state.isUpdateSchedules ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Atualização Agenda: {this.state.isUpdateSchedules ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Atualização Fazendas: {this.state.isUpdatePlaces ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Agenda: {this.state.isSchedulesInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Safras: {this.state.isCropsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Cultivars: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>

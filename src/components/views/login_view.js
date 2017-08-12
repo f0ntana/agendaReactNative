@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, StyleSheet, Dimensions, Image, AsyncStorage } from 'react-native'
 import { FormLabel, FormInput, FormValidationMessage, Button, Card } from 'react-native-elements'
 import { Icon } from 'react-native-elements'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { API } from '../../utils/api'
 
@@ -46,7 +47,7 @@ export default class LoginHome extends Component {
 
 	render() {
 		return (
-			<View style={styles.container}>
+			<KeyboardAwareScrollView ref='scroll'>
 				<View style={{ alignItems: 'center' }}>
 					<Image
 						source={ require('../../images/logo.png') }
@@ -54,34 +55,25 @@ export default class LoginHome extends Component {
 						resizeMode="contain"
 					/>
 				</View>
-				<Card containerStyle={{padding: 15}} title="LOGIN">
-					<FormLabel>Email</FormLabel>
-					<FormInput 
-						ref='forminput' 
-						textInputRef='email'
-						onChangeText={(val) => { this.setState( {'email': val} )}}
-					/>
-					<FormLabel>Senha</FormLabel>	
-					<FormInput 
-						ref='forminput'
-						textInputRef='password'
-						onChangeText={(val) => { this.setState( {'password': val} )}}
-					/>
-					<Button 
-						icon={{name: 'user', type: 'font-awesome'}} 
-						style={{ marginTop: 20}} 
-						title='Entrar'
-						onPress={() => this.doLogin()} 
-					/>
-				</Card>
-			</View>
+				<FormLabel>Email</FormLabel>
+				<FormInput 
+					ref='forminput' 
+					textInputRef='email'
+					onChangeText={(val) => { this.setState( {'email': val} )}}
+				/>
+				<FormLabel>Senha</FormLabel>	
+				<FormInput 
+					ref='forminput'
+					textInputRef='password'
+					onChangeText={(val) => { this.setState( {'password': val} )}}
+				/>
+				<Button 
+					icon={{name: 'user', type: 'font-awesome'}} 
+					style={{ marginTop: 20}} 
+					title='Entrar'
+					onPress={() => this.doLogin()} 
+				/>
+			</KeyboardAwareScrollView>
 		)
 	}	
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center',
-	}
-})

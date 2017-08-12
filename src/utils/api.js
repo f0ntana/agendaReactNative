@@ -20,6 +20,24 @@ export const API = {
         return response
     },
 
+    updateSyncSchedules(payload) {
+        let data = JSON.stringify( payload )
+        console.log(data)
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-update-schedules', {
+                method: 'post',
+                body: data,
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        console.log(response)
+        return response
+    },
+
     getSync() {
         let response = AsyncStorage.getItem('_token').then((value) => {
             return fetch(API_BASE + 'schedule-sync', {

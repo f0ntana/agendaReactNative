@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
-import { View, ScrollView, StyleSheet, Platform, Dimensions, Text} from 'react-native';
+import React, { Component } from 'react'
+import { View, ScrollView, StyleSheet, Platform, Dimensions, Text} from 'react-native'
 import { Card, Badge, Button } from 'react-native-elements'
 import moment from 'moment'
 import _ from 'lodash'
 import t from 'tcomb-form-native'
-
 import realm from '../../models/schemas'
 
 var width = Dimensions.get('window').width - 20
@@ -86,15 +85,17 @@ let formOptions = {
 export default class AgendaDetail extends Component {
 	constructor(props) {
         super(props)
-
-        setTimeout(1000)
         var place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
+        var schedule = realm.objects('Schedule').filtered(`id = ${this.props.navigation.state.params.id}`)[0]
+        console.log(schedule)
         this.state = {
             schedule: this.props.navigation.state.params,
             params: place,
             latitude: null,
             longitude: null,
             error: null,
+            finished: schedule.finished,
+            start_travel: schedule.start_travel,
             initialvalue: {
                 crop_id: place.crop_id,
                 cultivar_id: place.cultivar_id,
@@ -109,19 +110,19 @@ export default class AgendaDetail extends Component {
                 v: place.v,
                 depth_gathering: place.depth_gathering,
                 desiccation: place.desiccation,
-                owner_present: this.props.navigation.state.params.owner_present,
+                owner_present: schedule.owner_present,
                 harvest_date: new Date(moment(place.harvest_date).valueOf()),
                 planting_date: new Date(moment(place.planting_date).valueOf()),
             }
         }
-        console.log(this.state.params)
     }
 
     saveChanges() {
         var value = this.refs.form.getValue()
         if (value) {
-            console.log(value)
+
             realm.write(() => {
+
                 let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
                 schedule.owner_present = value.owner_present
 
@@ -141,18 +142,38 @@ export default class AgendaDetail extends Component {
                 place.desiccation = value.desiccation
                 place.harvest_date = value.harvest_date
                 place.planting_date = value.planting_date
+                
             })
             alert('Salvo com sucesso')
         }
     }
 
-    componentDidMount() {
+    getPosition() {
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 this.setState({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
                     error: null,
+                })
+
+                realm.write(() => {
+                    let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
+                    if (schedule.finished) {
+                        return alert('Visita já finalizada')
+                    }
+                    if (schedule.start_travel) {
+                        schedule.endLat = String(this.state.latitude)
+                        schedule.endLong = String(this.state.longitude)
+                        schedule.finished = true
+                        this.setState({ finished: true  })
+                        return alert('Visita finalizada')
+                    }
+                    schedule.startLat = String(this.state.latitude)
+                    schedule.startLong = String(this.state.longitude)
+                    schedule.start_travel = true
+                    this.setState({ start_travel: true  })
+                    return alert('Visita iniciada')
                 })
             },
             (error) => this.setState({ error: error.message }),
@@ -161,21 +182,26 @@ export default class AgendaDetail extends Component {
     }
 
   	render() {
-    	const { navigation } = this.props;
+    	const { navigation } = this.props
 
     	return (
             <ScrollView style={styles.container}>
                 <Card title={ this.state.params.name }>
+                
+                <Button
+                    raised
+                    icon={this.state.finished ? {name: 'ban', type: 'font-awesome'} : {name: 'cached'}}
+                    title={ this.state.finished ? 'Finalizada' : this.state.start_travel ? 'Finalizar Visita': 'Iniciar Visita'}
+                    backgroundColor={this.state.start_travel ? 'red': 'green'}
+                    style={{ margin: 10 }}
+                    onPress={this.getPosition.bind(this)} 
+                />
+
                 	<View style={styles.title}>
                         <Text style={styles.titleText}>
                             DESCRIÇÃO VISITA
                         </Text>
                     </View>
-                    <View style={styles.title}>
-                		<Text>Latitude: {this.state.latitude}</Text>
-                        <Text>Longitude: {this.state.longitude}</Text>
-                        {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
-                	</View>
                 	<View style={styles.infos}>
                 		<Text style={styles.infosText}>
 	                    	<Text style={{ fontWeight: 'bold' }}>Cliente: </Text> {this.state.params.client_name}
