@@ -1,152 +1,53 @@
 import React, { Component } from 'react'
-import { View, ScrollView, StyleSheet, Platform, Dimensions, Text} from 'react-native'
-import { Card, Badge, Button } from 'react-native-elements'
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput} from 'react-native'
+import { Card, Badge, Button, List, ListItem } from 'react-native-elements'
 import moment from 'moment'
-import _ from 'lodash'
 import t from 'tcomb-form-native'
 import realm from '../../models/schemas'
+import Graphic from './graphic'
+import _ from 'lodash'
+import ActionButton from 'react-native-action-button'
+import { Icon } from 'react-native-elements'
+import Modal from 'react-native-modal'
 
-var width = Dimensions.get('window').width - 20
-var Form = t.form.Form
-let myFormatFunction = (format,date) =>{
-    return moment(date).format(format)
-}
-
-var PlantingDate = {
-    label: 'Data Plantio',
-    mode:'date',
-    config: {
-        format: (date) => myFormatFunction("DD/MM/YYYY", date)
-    }
-}
-
-var HarvestDate = {
-    label: 'Data Colheita',
-    mode:'date',
-    config: {
-        format: (date) => myFormatFunction("DD/MM/YYYY", date)
-    }
-}
-
-let crops = realm.objects('Crop')
-let objCrop = crops.reduce((acc,row) => {
-    acc[row.id] = row.name
-    return acc
-}, {})
-var Crop = t.enums(objCrop, "Crop")
-
-let cultivars = realm.objects('Cultivar')
-let objCultivar = cultivars.reduce((acc,row) => {
-    acc[row.id] = row.name
-    return acc
-}, {})
-var Cultivar = t.enums(objCultivar, "Cultivar")
-
-var Infos = t.struct({
-    crop_id: Crop,
-    cultivar_id: Cultivar,
-    productivity: t.Number,
-    planting_date: t.Date,
-    harvest_date: t.Date,
-    population: t.Number,
-    spacing: t.Number,
-    fertility: t.Number,
-    argil: t.Number,
-    mo: t.Number,
-    p: t.Number,
-    k: t.Number,
-    v: t.Number,
-    depth_gathering: t.Number,
-    desiccation: t.Boolean,
-    owner_present: t.Boolean,
-})
-
-let formOptions = {
-    fields: {
-        crop_id: { label: 'Safra' },
-        cultivar_id: { label: 'Cultivar' },
-        productivity: { label: 'Produtividade' },
-        population: { label: 'População' },
-        spacing: { label: 'Espaçamento' },
-        fertility: { label: 'Fertilidade' },
-        argil: { label: 'Argila' },
-        mo: { label: 'MO' },
-        p: { label: 'P' },
-        k: { label: 'K' },
-        v: { label: 'V' },
-        depth_gathering: { label: 'Profundidade Coleta' },
-        desiccation: { label: 'Dessecada' },
-        owner_present: { label: 'Proprietátio Presente' },
-        harvest_date: HarvestDate,
-        planting_date: PlantingDate,
-    }
-}
+import ListProductions from './agenda_list_productions'
 
 export default class AgendaDetail extends Component {
 	constructor(props) {
         super(props)
         var place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
         var schedule = realm.objects('Schedule').filtered(`id = ${this.props.navigation.state.params.id}`)[0]
-        console.log(schedule)
         this.state = {
-            schedule: this.props.navigation.state.params,
-            params: place,
-            latitude: null,
-            longitude: null,
-            error: null,
-            finished: schedule.finished,
-            start_travel: schedule.start_travel,
-            initialvalue: {
-                crop_id: place.crop_id,
-                cultivar_id: place.cultivar_id,
-                productivity: place.productivity,
-                population: place.population,
-                spacing: place.spacing,
-                fertility: place.fertility,
-                argil: place.argil,
-                mo: place.mo,
-                p: place.p,
-                k: place.k,
-                v: place.v,
-                depth_gathering: place.depth_gathering,
-                desiccation: place.desiccation,
-                owner_present: schedule.owner_present,
-                harvest_date: new Date(moment(place.harvest_date).valueOf()),
-                planting_date: new Date(moment(place.planting_date).valueOf()),
-            }
+            schedule: schedule,
+            place: place,
+            productions: {},
+            isModalVisible: false,
+            resume: ''
         }
     }
 
-    saveChanges() {
-        var value = this.refs.form.getValue()
-        if (value) {
-
-            realm.write(() => {
-
-                let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
-                schedule.owner_present = value.owner_present
-
-                let place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
-                place.crop_id = parseInt(value.crop_id)
-                place.cultivar_id = parseInt(value.cultivar_id)
-                place.productivity = value.productivity
-                place.population = value.population
-                place.spacing = value.spacing
-                place.fertility = value.fertility.toString()
-                place.argil = value.argil
-                place.mo = value.mo
-                place.p = value.p
-                place.k = value.k
-                place.v = value.v
-                place.depth_gathering = value.depth_gathering
-                place.desiccation = value.desiccation
-                place.harvest_date = value.harvest_date
-                place.planting_date = value.planting_date
-                
-            })
-            alert('Salvo com sucesso')
-        }
+    componentWillMount () {
+        let productions = realm.objects('Production').filtered('place_id = ' + this.state.place.id).sorted('crop_id', 'DESC')
+        this.setState({ productions: productions })
     }
+
+    _showModal() {
+        this.setState({ isModalVisible: true })
+    }
+
+    _hideModal(finished) {
+        if(!this.state.resume){
+            alert('Favor faça um resumo')
+            return
+        }
+        realm.write(() => {
+            let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
+            schedule.resume = this.state.resume
+        })
+
+        this.setState({ isModalVisible: false })
+    }
+
 
     getPosition() {
         navigator.geolocation.getCurrentPosition(
@@ -166,8 +67,8 @@ export default class AgendaDetail extends Component {
                         schedule.endLat = String(this.state.latitude)
                         schedule.endLong = String(this.state.longitude)
                         schedule.finished = true
-                        this.setState({ finished: true  })
-                        return alert('Visita finalizada')
+                        this.setState({ finished: true })
+                        return this._showModal()
                     }
                     schedule.startLat = String(this.state.latitude)
                     schedule.startLong = String(this.state.longitude)
@@ -177,8 +78,17 @@ export default class AgendaDetail extends Component {
                 })
             },
             (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+            { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 },
         )
+    }
+
+    renderProductionDetail (item) {
+        const { navigate } = this.props.navigation
+        let data = { ...item }
+        if(!item){
+            data = { new: true, place_id: this.props.navigation.state.params.place_id }
+        }
+        navigate('Agenda_Production', data)
     }
 
   	render() {
@@ -186,17 +96,22 @@ export default class AgendaDetail extends Component {
 
     	return (
             <ScrollView style={styles.container}>
-                <Card title={ this.state.params.name }>
-                
-                <Button
-                    raised
-                    icon={this.state.finished ? {name: 'ban', type: 'font-awesome'} : {name: 'cached'}}
-                    title={ this.state.finished ? 'Finalizada' : this.state.start_travel ? 'Finalizar Visita': 'Iniciar Visita'}
-                    backgroundColor={this.state.start_travel ? 'red': 'green'}
-                    style={{ margin: 10 }}
-                    onPress={this.getPosition.bind(this)} 
-                />
-
+                <Modal isVisible={this.state.isModalVisible}>
+                    <View style={styles.modalContent}>
+                        <Text>Resumo da visita</Text>
+                        <TextInput
+                            style={{height: 60, borderColor: 'gray', borderWidth: 1}}
+                            onChangeText={(resume) => this.setState({ resume })}
+                            value={this.state.resume}
+                          />
+                        <View style={{ flexDirection: 'row'}}>
+                            <TouchableOpacity onPress={() => this._hideModal()} style={ styles.buttonSave }>
+                                <Text>Salvar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+                <Card title={ this.state.place.name }>
                 	<View style={styles.title}>
                         <Text style={styles.titleText}>
                             DESCRIÇÃO VISITA
@@ -204,37 +119,39 @@ export default class AgendaDetail extends Component {
                     </View>
                 	<View style={styles.infos}>
                 		<Text style={styles.infosText}>
-	                    	<Text style={{ fontWeight: 'bold' }}>Cliente: </Text> {this.state.params.client_name}
+	                    	<Text style={{ fontWeight: 'bold' }}>Cliente: </Text> {this.state.place.client_name}
 	                    </Text>
                 		<Text style={styles.infosText}>
-	                    	<Text style={{ fontWeight: 'bold' }}>Fazenda: </Text> {this.state.params.name}
+	                    	<Text style={{ fontWeight: 'bold' }}>Fazenda: </Text> {this.state.place.name}
 	                    </Text>
                 		<Text style={styles.infosText}>
-                			<Text style={{ fontWeight: 'bold' }}>Endereço: </Text> {this.state.params.address}
+                			<Text style={{ fontWeight: 'bold' }}>Endereço: </Text> {this.state.place.address}
                 		</Text>
                 		<Text style={styles.infosText}>
-                			<Text style={{ fontWeight: 'bold' }}>Intinerário: </Text> {this.state.params.itinerary}
+                			<Text style={{ fontWeight: 'bold' }}>Intinerário: </Text> {this.state.place.itinerary}
                 		</Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Cidade/UF: </Text> {this.state.params.city} - {this.state.params.state}
+                            <Text style={{ fontWeight: 'bold' }}>Cidade/UF: </Text> {this.state.place.city} - {this.state.place.state}
                         </Text>
                 	</View>
-                	<View style={styles.infos}>
-                        <Form
-                            ref="form"
-                            type={Infos}
-                            value={this.state.initialvalue}
-                            options={formOptions}
-                        />
-                        <Button
-                            raised
-                            icon={{name: 'check', size: 32}}
-                            buttonStyle={{backgroundColor: 'gray', borderRadius: 10}}
-                            textStyle={{textAlign: 'center'}}
-                            title={`Salvar alterações`}
-                            onPress={this.saveChanges.bind(this)}
-                        />
-                	</View>
+                    <Graphic data={ this.state.productions } />
+                    <ActionButton
+                        buttonColor="rgba(231,76,60,1)"
+                        onPress={() => this.renderProductionDetail()}
+                    />
+                </Card>
+                <Button
+                    icon={this.state.schedule.finished ? {name: 'ban', type: 'font-awesome'} : {name: 'cached'}}
+                    title={ this.state.schedule.finished ? 'Finalizada' : this.state.schedule.start_travel ? 'Finalizar Visita': 'Iniciar Visita'}
+                    backgroundColor={this.state.schedule.start_travel ? 'red': 'green'}
+                    style={{ marginTop: 5, borderRadius: 4, borderColor: 'rgba(0, 0, 0, 0.1)'}}
+                    onPress={ () => this.getPosition() }
+                />
+                <Card>
+                    <View style={styles.title}>
+                        <Text style={styles.titleText}>INFORMAÇÕES</Text>
+                    </View>
+                    <ListProductions data={ this.state.productions } onPress={(item) => this.renderProductionDetail(item)} />
                 </Card>
             </ScrollView>
         )
@@ -259,5 +176,49 @@ const styles = StyleSheet.create({
     },
     titleText: {
     	fontSize: 16
+    },
+    button: {
+        backgroundColor: 'lightblue',
+        padding: 12,
+        margin: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 4,
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 4,
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    bottomModal: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+    actionButtonIcon: {
+        fontSize: 20,
+        height: 22,
+        color: 'white',
+    },
+    buttonSave: {
+        backgroundColor: 'green',
+        padding: 12,
+        margin: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 4,
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    buttonCancel: {
+        backgroundColor: 'lightgray',
+        padding: 12,
+        margin: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 4,
+        borderColor: 'rgba(0, 0, 0, 0.1)',
     }
 })

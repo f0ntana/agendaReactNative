@@ -1,5 +1,5 @@
 {
-	"name": "Agenda",
+	"name": "PetrovinaCRM",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -11,16 +11,21 @@
 		"moment": "^2.18.1",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.45.1",
-		"react-native-calendars": "^1.5.6",
+		"react-native-action-button": "^2.8.0",
+		"react-native-calendars": "^1.5.8",
+		"react-native-collapsible": "^0.9.0",
 		"react-native-elements": "^0.13.0",
 		"react-native-keyboard-aware-scroll-view": "^0.2.9",
+		"react-native-modal": "^3.1.0",
+		"react-native-svg": "^5.2.0",
 		"react-native-tab-view": "0.0.67",
 		"react-native-vector-icons": "^4.3.0",
 		"react-navigation": "git+https://github.com/martnu/react-navigation.git#pass-down-drawer-lock-mode",
-		"react-navigation-addons": "github:satya164/react-navigation-addons",
 		"realm": "^1.10.1",
 		"shallowequal": "^1.0.1",
-		"tcomb-form-native": "^0.6.9"
+		"tcomb-form-native": "^0.6.9",
+		"victory-native": "^0.14.0",
+		"yarn": "^0.27.5"
 	},
 	"devDependencies": {
 		"babel-jest": "20.0.3",

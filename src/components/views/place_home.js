@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native'
 import { StackNavigator } from 'react-navigation';
 import { List, ListItem, Icon } from 'react-native-elements'
 import realm from '../../models/schemas'
@@ -9,17 +9,46 @@ class PlaceHome extends Component {
 		super(props)
 		this.state = {
 			list: [],
+			newlist: [],
+			text: ''
 		}
 	}
 
 	componentDidMount(){
-		let list = realm.objects('Place')
+		let list = realm.objects('Place').sorted('name')
 		this.setState({list: list})
+		this.setState({newlist: list})
 	}
 
-	renderPlaceDetail(item) {
+	filterList(text) {
+		this.setState({ text: text })
+		let newlist = this.state.list.filter( (item) => {
+			if (item.name.indexOf(text) != -1 || item.client_name.indexOf(text) != -1) {
+			 	return item
+			}
+		})
+		this.setState({ newlist: newlist })
+	}
+
+	renderPlaceDetail (item) {
 		const { navigate } = this.props.navigation;
 		navigate('Place_Detail', item);
+	}
+
+	renderRow (data) {
+		return (
+			<ListItem
+				key={data.id}
+				title={ `${data.id} - ${data.name}` }
+				subtitle={
+		          	<View>
+		            	<Text style={{ fontSize: 12, marginLeft: 10 }}>{data.client_name}</Text>
+		            	<Text style={{ fontSize: 12, marginLeft: 10 }}>{`${data.city} - ${data.state}`}</Text>
+		          	</View>
+		        }
+				onPress={() => this.renderPlaceDetail(data)}
+			/>
+		)
 	}
 
 	render() {
@@ -28,17 +57,19 @@ class PlaceHome extends Component {
 			<View style={styles.container}>
 				<View style={styles.title}>
 					<Text style={styles.textTitle}>Listagem das fazendas</Text>
+					<Text style={styles.searchText}>Digite aqui a fazenda ou proprietário:</Text>
+					<TextInput
+				        style={{ height: 40, borderWidth: 1, marginLeft: 10, marginRight: 10 }}
+				        onChangeText={(text) => this.filterList(text)}
+				        value={this.state.text}
+				    />
 				</View>
 				<List containerStyle={{marginBottom: 20}}>
-				{
-					this.state.list.map((l, i) => (
-						<ListItem
-							key={i}
-							title={l.name}
-							onPress={() => this.renderPlaceDetail(l)}
-						/>
-					))
-				}
+					<FlatList
+					  	data={this.state.newlist}
+					  	renderItem={({item}) => this.renderRow(item) }
+					  	keyExtractor={(item, index) => item.id}
+					/>
 				</List>
 			</View>
 		)
@@ -52,6 +83,9 @@ const styles = StyleSheet.create({
 	title: {
 		justifyContent: 'center',
 		alignItems: 'center'
+	},
+	searchText: {
+		marginTop: 20
 	},
 	textTitle: {
 		marginTop: 15,

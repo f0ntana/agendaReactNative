@@ -1,127 +1,43 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { StackNavigator } from 'react-navigation'
-import { Icon } from 'react-native-elements'
-import moment from 'moment'
+import {Grid, Col, Icon} from 'react-native-elements';
 
+import _ from 'lodash'
 import { API } from '../../utils/api'
 import realm from '../../models/schemas'
 
-function saveSchedules(items) {
-	let promise = new Promise( (resolve, reject) => {
-		console.log('Sincronizando Agenda')
-		let all = realm.objects('Schedule')
-		realm.delete(all)
-		items.map(item => {
-			let schedule = realm.create('Schedule', {
-				id: item.id,
-				place_id: item.place_id,
-				name: item.name,
-				date: moment(item.date).toDate(),
-				description: item.description,
-				owner_present: item.owner_present ? true : false,
-				finished: item.finished ? true : false,
-				start_travel: item.start_travel ? true : false,
-				startLat: item.startLat ? item.startLat : '',
-				startLong: item.startLong ? item.startLong : '',
-				endLat: item.endLat ? item.endLat : '',
-				endLong: item.endLong ? item.endLon : '',
-			})
-		})
-		resolve()
-	})
-	return promise
-}
-
-function saveCrops(items) {
-	let promise = new Promise( (resolve, reject) => {
-		console.log('Sincronizando Safras')
-		let all = realm.objects('Crop')
-		realm.delete(all)
-		items.map(item => {
-			let crop = realm.create('Crop', {
-				id: item.id,
-				name: item.name
-			})
-		})
-		resolve()
-	})
-	return promise
-}
-
-function saveCultivars(items) {
-    let promise = new Promise( (resolve, reject) => {
-        console.log('Sincronizando Cultivars')
-        let all = realm.objects('Cultivar')
-        realm.delete(all)
-        items.map(item => {
-            let cultivar = realm.create('Cultivar', {
-                id: item.id,
-                name: item.name,
-                cycle: item.cycle ? item.cycle : '0',
-                transgenic: item.transgenic ? true : false
-            })
-        })
-        resolve()
-    })
-
-    return promise
-}
-
-function savePlaces(items) {
-	let promise = new Promise( (resolve, reject) => {
-		console.log('Sincronizando Fazendas')
-		let all = realm.objects('Place')
-		realm.delete(all)
-		items.map(item => {
-			let place = realm.create('Place', {
-				id: item.id,
-		  		client_id: item.client.id,
-		  		client_name: item.client.name,
-		  		crop_id: item.plot.production.crop_id,
-			    cultivar_id: item.plot.production.cultivar_id,
-			    name: item.name,
-			    address: item.address,
-			    itinerary: item.itinerary,
-			    city: item.city.name,
-			    state: item.city.state.slug,
-			    productivity: item.plot.production.productivity,
-			    planting_date: moment(item.plot.production.planting_date).toDate(),
-			    harvest_date: moment(item.plot.production.harvest_date).toDate(),
-			    population: item.plot.production.population,
-			    spacing: item.plot.production.spacing,
-			    fertility: item.plot.production.fertility,
-			    argil: item.plot.production.argil,
-			    mo: item.plot.production.mo,
-			    p: item.plot.production.p,
-			    k: item.plot.production.k,
-			    v: item.plot.production.v,
-			    depth_gathering: item.plot.production.depth_gathering,
-			    desiccation: item.plot.production.desiccation ? true : false
-			})
-		})
-		resolve()
-	})
-	return promise
-}
-
+import saveCrops from './crops'
+import saveCultivars from './cultivars'
+import saveSchedules from './schedules'
+import savePlaces from './places'
+import saveProductions from './productions'
+import saveSeedBrands from './seedBrands'
+import saveQuestions from './questions'
+import saveAnswers from './answers'
 
 class SyncView extends Component {
 
 	constructor(props) {
 		super(props)
 		this.state = {
-			isUpdatePlaces: false,
+			isUpdateProductions: false,
 			isUpdateSchedules: false,
+			isUpdateAnswersProduction: false,
 			isSchedulesInSync: false,
 			isCropsInSync: false,
 			isCultivarsInSync: false,
-			isPlacesInSync: false
+			isPlacesInSync: false,
+			isProductionsInSync: false,
+			isSeedBrandsInSync: false,
+			isQuestionsInSync: false,
+			isAnswersInSync: false
 		}
 	}
 
 	async componentDidMount() {
-		console.log('Start Update Schedule')
+
+		//ENVIAR ATUALIZAÇÕES DA AGENDA PARA O SERVIDOR
 		let schedules = realm.objects('Schedule')
 		let itemsSchedules = schedules.reduce( (acc, x) => {
 			acc[x.id] = x
@@ -130,44 +46,74 @@ class SyncView extends Component {
 		await API.updateSyncSchedules(itemsSchedules)
 		.then(response => response.json())
 		.then(response => {
-			console.log('response', response)
-			// if(response.success){
-				this.setState({ isUpdateSchedules: true })	
-			// }
+			console.log(response)
+			this.setState({ isUpdateSchedules: true })
 		})
 
-		console.log('Start Update Place')
-		let places = realm.objects('Place')
-		let items = places.reduce( (acc, x) => {
+
+		//ENVIAR ATUALIZAÇÕES DAS PRODUÇÕES PARA O SERVIDOR
+		let productions = realm.objects('Production')
+		let itemsProductions = productions.reduce( (acc, x) => {
 			acc[x.id] = x
 			return acc
 		}, {})
-		await API.updateSync(items)
+		await API.updateSyncProductions(itemsProductions)
 		.then(response => response.json())
 		.then(response => {
-			console.log('response', response)
-			// if(response.success){
-				this.setState({ isUpdatePlaces: true })	
-			// }
+			this.setState({ isUpdateProductions: true })
 		})
 
-		console.log('Start Get')
+
+		//ENVIAR ATUALIZAÇÕES DAS RESPOSTAS DAS PRODUÇÕES PARA O SERVIDOR
+		let answersProduction = realm.objects('AnswerProduction')
+		let itemsAnswersProduction = _.reduce(answersProduction, (obj,param)  => {
+			obj[param.id] = param
+			return obj
+		}, {});
+
+		console.log(itemsAnswersProduction)
+		await API.updateSyncAnswersProduction(itemsAnswersProduction)
+		.then(response => response.json())
+		.then(response => {
+			console.log(response)
+			this.setState({ isUpdateAnswersProduction: true })
+		})
+
 		await API.getSync()
 		.then(response => response.json())
 		.then(response => {
 			console.log(response)
 			realm.write(() => {
-				saveSchedules(response.schedules).then( () => {
-		            this.setState({ isSchedulesInSync: true })
-		        })
 				saveCrops(response.crops).then( () => {
 		            this.setState({ isCropsInSync: true })
 		        })
-				saveCultivars(response.cultivars).then( () => {
+
+		        saveCultivars(response.cultivars).then( () => {
 		            this.setState({ isCultivarsInSync: true })
 		        })
-				savePlaces(response.places).then( () => {
+
+		        saveSeedBrands(response.seedBrands).then( () => {
+		            this.setState({ isSeedBrandsInSync: true })
+		        })
+
+		        savePlaces(response.places).then( (resp) => {
 		            this.setState({ isPlacesInSync: true })
+		        })
+
+				saveSchedules(response.schedules).then( () => {
+		            this.setState({ isSchedulesInSync: true })
+		        })
+
+		        saveProductions(response.productions).then( () => {
+		            this.setState({ isProductionsInSync: true })
+		        })
+
+		        saveQuestions(response.questions).then( () => {
+		            this.setState({ isQuestionsInSync: true })
+		        })
+
+		        saveAnswers(response.answers).then( () => {
+		            this.setState({ isAnswersInSync: true })
 		        })
 			})
 		})
@@ -176,16 +122,21 @@ class SyncView extends Component {
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text>Sincronização:</Text>
+				<Text style={styles.title}>Status Sincronização:</Text>
 				<Text>Atualização Agenda: {this.state.isUpdateSchedules ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Atualização Fazendas: {this.state.isUpdatePlaces ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Agenda: {this.state.isSchedulesInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Atualização Fazendas: {this.state.isUpdateProductions ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Atualização Questionário: {this.state.isUpdateAnswersProduction ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Safras: {this.state.isCropsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Cultivars: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Marcas de Sementes: {this.state.isSeedBrandsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Fazendas: {this.state.isPlacesInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Produções: {this.state.isProductionsInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Agenda: {this.state.isSchedulesInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Perguntas: {this.state.isQuestionsInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Respostas: {this.state.isAnswersInSync ? 'Finalizado' : 'Aguardando'}</Text>
 			</View>
 		)
-	} 
+	}
 }
 
 const Sync = StackNavigator({
@@ -228,8 +179,13 @@ Sync.navigationOptions = {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: 'center',
+		paddingTop: 20,
 		alignItems: 'center'
+	},
+	title: {
+		padding: 20,
+		fontWeight: '700',
+		fontSize: 16
 	}
 })
 

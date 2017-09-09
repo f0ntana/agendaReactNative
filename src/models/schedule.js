@@ -7,6 +7,7 @@ Schedule.schema = {
 		name: 'string',
 		date: 'date',
 		description: 'string',
+		resume: 'string',
 		owner_present: 'bool',
 		finished: 'bool',
 		start_travel: 'bool',

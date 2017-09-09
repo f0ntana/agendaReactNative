@@ -1,13 +1,14 @@
 import { AsyncStorage } from 'react-native'
 
-const API_BASE = 'http://petrovina-crm.softsul.agr.br/api/'
+// const API_BASE = 'http://petrovina-crm.softsul.agr.br/api/'
+const API_BASE = 'http://localhost:8000/api/'
 
 export const API = {
 
-    updateSync(payload) {
+    updateSyncProductions(payload) {
         let data = JSON.stringify( payload )
         let response = AsyncStorage.getItem('_token').then((value) => {
-            return fetch(API_BASE + 'schedule-sync-update', {
+            return fetch(API_BASE + 'sync-productions-from-app', {
                 method: 'post',
                 body: data,
                 headers: {
@@ -22,9 +23,8 @@ export const API = {
 
     updateSyncSchedules(payload) {
         let data = JSON.stringify( payload )
-        console.log(data)
         let response = AsyncStorage.getItem('_token').then((value) => {
-            return fetch(API_BASE + 'schedule-sync-update-schedules', {
+            return fetch(API_BASE + 'sync-schedules-from-app', {
                 method: 'post',
                 body: data,
                 headers: {
@@ -34,7 +34,22 @@ export const API = {
                 }
             })
         })
-        console.log(response)
+        return response
+    },
+
+    updateSyncAnswersProduction(payload) {
+        let data = JSON.stringify( payload )
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'sync-answers-productions-from-app', {
+                method: 'post',
+                body: data,
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
         return response
     },
 

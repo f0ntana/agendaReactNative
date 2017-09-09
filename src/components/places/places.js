@@ -6,6 +6,7 @@ import { Icon } from 'react-native-elements';
 
 import PlaceHome from '../views/place_home';
 import PlaceDetails from '../views/place_detail';
+import AgendaProductionView from '../views/agenda_production';
 
 const PlaceView = ({ navigation }) => (
   <PlaceHome navigation={navigation} />
@@ -16,29 +17,36 @@ const PlaceDetailsView = ({ navigation }) => (
 );
 
 const Place = StackNavigator({
-  Place: {
-    screen: PlaceView,
-    path: '/',
-    navigationOptions: ({ navigation }) => ({
-      title: 'FAZENDA',
-      headerLeft: (
-        <Icon
-          name="menu"
-          size={30}
-          type="entypo"
-          style={{ paddingLeft: 10 }}
-          onPress={() => navigation.navigate('DrawerOpen')}
-        />
-      ),
-    }),
-  },
-  Place_Detail: {
-    screen: PlaceDetailsView,
-    path: '/place_detail',
-    navigationOptions: {
-      title: 'FAZENDA DETALHE',
+    Place: {
+        screen: PlaceView,
+        path: '/',
+        navigationOptions: ({ navigation }) => ({
+            title: 'FAZENDA',
+            headerLeft: (
+                <Icon
+                    name="menu"
+                    size={30}
+                    type="entypo"
+                    style={{ paddingLeft: 10 }}
+                    onPress={() => navigation.navigate('DrawerOpen')}
+                />
+            ),
+        }),
     },
-  },
+    Place_Detail: {
+        screen: PlaceDetailsView,
+        path: '/place_detail',
+        navigationOptions: {
+            title: 'FAZENDA DETALHE',
+        },
+    },
+    Place_Production: {
+        screen: AgendaProductionView,
+        path: '/place_production',
+        navigationOptions: {
+            title: 'FAZENDA DETALHE',
+        },
+    },
 })
 
 PlaceView.navigationOptions = {

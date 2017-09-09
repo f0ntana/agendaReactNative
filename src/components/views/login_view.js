@@ -17,7 +17,7 @@ export default class LoginHome extends Component {
 		let token = AsyncStorage.getItem('_token').then( value => {
 			if(value){
 				const { navigate } = this.props.navigation;
-				navigate('Agenda');	
+				navigate('Agenda');
 			}
 		})
 
@@ -26,7 +26,7 @@ export default class LoginHome extends Component {
 			password: ''
 		}
 	}
-	
+
 	doLogin() {
 		API.postLogin(this.state)
 		.then(response => response.json())
@@ -38,9 +38,9 @@ export default class LoginHome extends Component {
 					alert('erro ao salvar token')
 				}
 				const { navigate } = this.props.navigation;
-				navigate('Agenda');	
+				navigate('Agenda');
 			} else {
-				alert('Dados inválidos')	
+				alert('Dados inválidos')
 			}
 		})
 	}
@@ -56,24 +56,25 @@ export default class LoginHome extends Component {
 					/>
 				</View>
 				<FormLabel>Email</FormLabel>
-				<FormInput 
-					ref='forminput' 
+				<FormInput
+					ref='forminput'
 					textInputRef='email'
 					onChangeText={(val) => { this.setState( {'email': val} )}}
 				/>
-				<FormLabel>Senha</FormLabel>	
-				<FormInput 
+				<FormLabel>Senha</FormLabel>
+				<FormInput
 					ref='forminput'
 					textInputRef='password'
+					secureTextEntry={true}
 					onChangeText={(val) => { this.setState( {'password': val} )}}
 				/>
-				<Button 
-					icon={{name: 'user', type: 'font-awesome'}} 
-					style={{ marginTop: 20}} 
+				<Button
+					icon={{name: 'user', type: 'font-awesome'}}
+					style={{ marginTop: 20}}
 					title='Entrar'
-					onPress={() => this.doLogin()} 
+					onPress={() => this.doLogin()}
 				/>
 			</KeyboardAwareScrollView>
 		)
-	}	
+	}
 }

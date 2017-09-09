@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { StackNavigator } from 'react-navigation'
-import { Icon } from 'react-native-elements' 
+import { Icon } from 'react-native-elements'
 
 import LoginHome from '../views/login_view.js'
 
@@ -16,21 +16,7 @@ const Login = StackNavigator({
 })
 
 Login.navigationOptions = {
-	drawerLabel: 'Login',
-	drawerIcon: ({ tintColor }) => (
-		<Icon
-			name="close-circle-outline"
-			size={30}
-			style={{
-				width: 50,
-				height: 50,
-				alignItems: 'center',
-				justifyContent: 'center',
-			}}
-			type="material-community"
-			color={tintColor}
-		/>
-	)
+	drawerLabel: ' '
 }
 
 export default Login

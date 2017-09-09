@@ -3,4 +3,4 @@ import {
 } from 'react-native';
 import App from './src/app';
 
-AppRegistry.registerComponent('Agenda', () => App);
+AppRegistry.registerComponent('PetrovinaCRM', () => App);

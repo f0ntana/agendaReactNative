@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Image, Dimensions } from 'react-native';
+import { View, Image, Dimensions, Text } from 'react-native';
 import { DrawerNavigator, DrawerItems, StackNavigator } from 'react-navigation';
 
 import Login from './components/login/login';
+import Logout from './components/login/logout';
 import Fazenda from './components/places/places';
 import Agenda from './components/menu/agenda';
 import Sync from './components/sync/sync';
@@ -13,7 +14,7 @@ const CustomDrawerContentComponent = props => (
 	<View style={{ flex: 1, backgroundColor: '#b1b6bb' }}>
 		<View style={{ marginTop: 40, justifyContent: 'center', alignItems: 'center' }}>
 			<Image
-				source={require('./images/logo.png')}
+				source={require('./images/logo2.png')}
 				style={{ width: SCREEN_WIDTH * 0.57 }}
 				resizeMode="contain"
 			/>
@@ -36,6 +37,13 @@ const MainRoot = DrawerNavigator(
 			path: '/sync',
 			screen: Sync,
 		},
+		Logout: {
+			path: '/logout',
+			screen: Logout,
+			navigationOptions: ({navigation}) => ({
+				drawerLockMode: 'locked-closed'
+		    })
+		},
 		Login: {
 			path: '/login',
 			screen: Login,
@@ -45,7 +53,7 @@ const MainRoot = DrawerNavigator(
 		}
 	},
 	{
-		initialRouteName: 'Login',
+		initialRouteName: 'Fazenda',
 		contentOptions: {
 			activeTintColor: '#548ff7',
 			activeBackgroundColor: 'transparent',
