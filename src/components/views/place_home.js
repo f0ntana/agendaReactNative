@@ -56,10 +56,12 @@ class PlaceHome extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={styles.title}>
-					<Text style={styles.textTitle}>Listagem das fazendas</Text>
-					<Text style={styles.searchText}>Digite aqui a fazenda ou proprietário:</Text>
+					<View style={styles.viewTitle}>
+						<Text style={styles.textTitle}>Listagem das fazendas</Text>
+						<Text style={styles.searchText}>Digite aqui a fazenda ou proprietário:</Text>
+					</View>
 					<TextInput
-				        style={{ height: 40, borderWidth: 1, marginLeft: 10, marginRight: 10, alignSelf: "stretch"  }}
+				        style={{ height: 40, borderWidth: 1, marginLeft: 10, marginRight: 10, alignItems: 'stretch'}}
 				        onChangeText={(text) => this.filterList(text)}
 				        value={this.state.text}
 				    />
@@ -80,9 +82,12 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1
 	},
+	viewTitle: {
+		alignItems: 'center'
+	},
 	title: {
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'stretch'
 	},
 	searchText: {
 		marginTop: 20

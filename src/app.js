@@ -53,7 +53,7 @@ const MainRoot = DrawerNavigator(
 		}
 	},
 	{
-		initialRouteName: 'Fazenda',
+		initialRouteName: 'Login',
 		contentOptions: {
 			activeTintColor: '#548ff7',
 			activeBackgroundColor: 'transparent',
