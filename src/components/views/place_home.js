@@ -23,7 +23,7 @@ class PlaceHome extends Component {
 	filterList(text) {
 		this.setState({ text: text })
 		let newlist = this.state.list.filter( (item) => {
-			if (item.name.indexOf(text) != -1 || item.client_name.indexOf(text) != -1) {
+			if (item.name.toLowerCase().indexOf(text.toLowerCase()) != -1 || item.client_name.toLowerCase().indexOf(text.toLowerCase()) != -1) {
 			 	return item
 			}
 		})
@@ -39,7 +39,7 @@ class PlaceHome extends Component {
 		return (
 			<ListItem
 				key={data.id}
-				title={ `${data.id} - ${data.name}` }
+				title={ `${data.name}` }
 				subtitle={
 		          	<View>
 		            	<Text style={{ fontSize: 12, marginLeft: 10 }}>{data.client_name}</Text>
@@ -59,7 +59,7 @@ class PlaceHome extends Component {
 					<Text style={styles.textTitle}>Listagem das fazendas</Text>
 					<Text style={styles.searchText}>Digite aqui a fazenda ou proprietário:</Text>
 					<TextInput
-				        style={{ height: 40, borderWidth: 1, marginLeft: 10, marginRight: 10 }}
+				        style={{ height: 40, borderWidth: 1, marginLeft: 10, marginRight: 10, alignSelf: "stretch"  }}
 				        onChangeText={(text) => this.filterList(text)}
 				        value={this.state.text}
 				    />

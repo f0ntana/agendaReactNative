@@ -25,8 +25,9 @@ export default class Graphic extends Component {
             }, {});
 
             let dataGraphic = [1,2,3,4,5,6];
+
             Object.keys(summary).forEach((production, index) => {
-                dataGraphic.push({ x: ((index+1)), y: summary[production], label: (`${realm.objects('Crop').filtered('id = ' + production)[0].name} \n ${Math.round(summary[production])} sc`), fill: "green" })
+                dataGraphic.push({ x: ((index+1)), y: summary[production], label: (`${realm.objects('Crop').filtered('id = ' + production)[0].name} \n \n ${Math.round(summary[production])} sc`), fill: "green" })
             })
 
             this.setState({ dataGraphic: dataGraphic })
