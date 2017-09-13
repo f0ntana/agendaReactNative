@@ -1,11 +1,7 @@
 import { AsyncStorage } from 'react-native'
 
 const API_BASE = 'http://petrovina-crm.softsul.agr.br/api/'
-<<<<<<< HEAD
-//const API_BASE = 'http://localhost:8000/api/'
-=======
 // const API_BASE = 'http://localhost:8000/api/'
->>>>>>> refs/remotes/origin/master
 
 export const API = {
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, Dimensions, Image, AsyncStorage } from 'react-native'
+import { View, StyleSheet, Dimensions, Image, AsyncStorage, Text, ActivityIndicator } from 'react-native'
 import { FormLabel, FormInput, FormValidationMessage, Button, Card } from 'react-native-elements'
 import { Icon } from 'react-native-elements'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -7,10 +7,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { API } from '../../utils/api'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
-const SCREEN_DIVIDER = SCREEN_WIDTH / 3
+const SCREEN_HEIGHT = Dimensions.get('window').height
+
+const IMAGELOGORENDER = require('./../../images/soja.png')
+const IMAGEPETROVINA = require('./../../images/petrovina.png')
 
 export default class LoginHome extends Component {
-
 	constructor(props) {
 		super(props)
 
@@ -23,11 +25,13 @@ export default class LoginHome extends Component {
 
 		this.state = {
 			email: '',
-			password: ''
+			password: '',
+			isLoading: false
 		}
 	}
 
 	doLogin() {
+		this.setState({isLoading: true})
 		API.postLogin(this.state)
 		.then(response => response.json())
 		.then(response => {
@@ -41,6 +45,7 @@ export default class LoginHome extends Component {
 				navigate('Agenda');
 			} else {
 				alert('Dados inválidos')
+				this.setState({isLoading: false})
 			}
 		})
 	}
@@ -48,33 +53,71 @@ export default class LoginHome extends Component {
 	render() {
 		return (
 			<KeyboardAwareScrollView ref='scroll'>
-				<View style={{ alignItems: 'center' }}>
-					<Image
-						source={ require('../../images/logo.png') }
-						style={{ width: SCREEN_WIDTH * 0.50 }}
-						resizeMode="contain"
-					/>
-				</View>
-				<FormLabel>Email</FormLabel>
-				<FormInput
-					ref='forminput'
-					textInputRef='email'
-					onChangeText={(val) => { this.setState( {'email': val} )}}
-				/>
-				<FormLabel>Senha</FormLabel>
-				<FormInput
-					ref='forminput'
-					textInputRef='password'
-					secureTextEntry={true}
-					onChangeText={(val) => { this.setState( {'password': val} )}}
-				/>
-				<Button
-					icon={{name: 'user', type: 'font-awesome'}}
-					style={{ marginTop: 20}}
-					title='Entrar'
-					onPress={() => this.doLogin()}
-				/>
+				<Image
+					source={ IMAGELOGORENDER }
+					style={styles.backgroundImage}
+					>
+					<Card containerStyle={{marginTop: 20, opacity: 0.8}}>
+
+						<Image
+							source={ IMAGEPETROVINA }
+							style={{ width: SCREEN_WIDTH * 0.80 }}
+							resizeMode="contain"
+						/>
+						<FormLabel labelStyle={styles.textForm}>Email</FormLabel>
+						<FormInput
+							inputStyle={styles.textForm}
+							ref='forminput'
+							textInputRef='email'
+							onChangeText={(val) => { this.setState( {'email': val} )}}
+						/>
+						<FormLabel labelStyle={styles.textForm}>Senha</FormLabel>
+						<FormInput
+							inputStyle={styles.textForm}
+							ref='forminput'
+							textInputRef='password'
+							secureTextEntry={true}
+							onChangeText={(val) => { this.setState( {'password': val} )}}
+						/>
+						<Button
+							icon={{name: 'user', type: 'font-awesome'}}
+							style={{ marginTop: 20}}
+							title='Entrar'
+							onPress={() => this.doLogin()}
+						/>
+						{this.state.isLoading &&
+							<ActivityIndicator
+				               color = '#338927'
+				               size = "large"
+				               style = {styles.activityIndicator}
+				            />
+				        }
+					</Card>
+
+				</Image>
+
 			</KeyboardAwareScrollView>
 		)
 	}
 }
+
+let styles = StyleSheet.create({
+	backgroundImage: {
+		flex: 1,
+		resizeMode: 'cover',
+		width: SCREEN_WIDTH,
+		height: SCREEN_HEIGHT
+	},
+	textForm: {
+		fontSize: 16
+	},
+	loading: {
+	    position: 'absolute',
+	    left: 0,
+	    right: 0,
+	    top: 0,
+	    bottom: 0,
+	    alignItems: 'center',
+	    justifyContent: 'center'
+  	}
+});

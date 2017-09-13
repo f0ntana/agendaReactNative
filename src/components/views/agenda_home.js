@@ -66,6 +66,13 @@ class AgendaHome extends Component {
 			return date
 		})
 
+		if(scheduleItems.length == 0)
+		{
+			grouped = []
+			let now = moment(NOW).format('YYYY-MM-DD')
+			grouped[now] = []
+		}
+
 		this.setState({
 			items: grouped
 		})
@@ -96,7 +103,9 @@ class AgendaHome extends Component {
 	renderEmptyDate() {
 		return (
 			<View style={styles.emptyDate}>
-				<Text>Sem atividades</Text>
+				<Card>
+					<Text>Você não possui visitas</Text>
+				</Card>
 			</View>
 		);
 	}
@@ -129,8 +138,7 @@ const styles = StyleSheet.create({
 	},
 	emptyDate: {
 		height: 15,
-		flex:1,
-		paddingTop: 30
+		flex:1
 	}
 });
 

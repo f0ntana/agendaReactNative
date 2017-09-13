@@ -16,7 +16,7 @@ const Login = StackNavigator({
 })
 
 Login.navigationOptions = {
-	drawerLabel: ' '
+	drawerLabel: ' ',
 }
 
 export default Login

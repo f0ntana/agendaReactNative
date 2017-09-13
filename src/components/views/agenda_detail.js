@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput} from 'react-native'
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator} from 'react-native'
 import { Card, Badge, Button, List, ListItem } from 'react-native-elements'
 import moment from 'moment'
 import t from 'tcomb-form-native'
@@ -22,7 +22,8 @@ export default class AgendaDetail extends Component {
             place: place,
             productions: {},
             isModalVisible: false,
-            resume: ''
+            resume: '',
+            isLoading: false
         }
     }
 
@@ -50,6 +51,7 @@ export default class AgendaDetail extends Component {
 
 
     getPosition() {
+        this.setState({ isLoading : true })
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 this.setState({
@@ -76,6 +78,7 @@ export default class AgendaDetail extends Component {
                     this.setState({ start_travel: true  })
                     return alert('Visita iniciada')
                 })
+                this.setState({ isLoading : false })
             },
             (error) => this.setState({ error: error.message }),
             { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 },
@@ -98,7 +101,9 @@ export default class AgendaDetail extends Component {
             <ScrollView style={styles.container}>
                 <Modal isVisible={this.state.isModalVisible}>
                     <View style={styles.modalContent}>
-                        <Text>Resumo da visita</Text>
+                        <View style={styles.titleModalContent}>
+                           <Text>Resumo da visita</Text>
+                        </View>
                         <TextInput
                             style={{height: 60, borderColor: 'gray', borderWidth: 1}}
                             onChangeText={(resume) => this.setState({ resume })}
@@ -140,6 +145,13 @@ export default class AgendaDetail extends Component {
                         onPress={() => this.renderProductionDetail()}
                     />
                 </Card>
+                {this.state.isLoading &&
+                    <ActivityIndicator
+                       color = '#338927'
+                       size = "large"
+                       style = {styles.activityIndicator}
+                    />
+                }
                 <Button
                     icon={this.state.schedule.finished ? {name: 'ban', type: 'font-awesome'} : {name: 'cached'}}
                     title={ this.state.schedule.finished ? 'Finalizada' : this.state.schedule.start_travel ? 'Finalizar Visita': 'Iniciar Visita'}
@@ -190,9 +202,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 22,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'stretch',
         borderRadius: 4,
         borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    titleModalContent: {
+        alignItems: 'center'
     },
     bottomModal: {
         justifyContent: 'flex-end',
@@ -220,5 +235,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 4,
         borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    loading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 })

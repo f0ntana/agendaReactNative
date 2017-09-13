@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { View, ScrollView, StyleSheet, Platform, Dimensions, Text} from 'react-native';
+import { View, ScrollView, StyleSheet, Platform, Dimensions, Text, Alert} from 'react-native';
 import { Card, Badge, Button } from 'react-native-elements'
 import moment from 'moment'
 import _ from 'lodash'
 import realm from '../../models/schemas'
 import Graphic from './graphic'
 import ListProductions from './agenda_list_productions'
-
+import ActionButton from 'react-native-action-button'
 
 export default class AgendaDetail extends Component {
 	constructor(props) {
@@ -29,6 +29,40 @@ export default class AgendaDetail extends Component {
             data = { new: true, place_id: this.props.navigation.state.params.place_id }
         }
         navigate('Place_Production', data)
+    }
+
+
+    writeSchedule() {
+        realm.write(() => {
+            realm.create('Schedule', {
+                id: 0,
+                place_id: this.state.params.id,
+                name: 'Visita Exporádica',
+                date: moment().toDate(),
+                description: 'Visita adicionada pelo App',
+                resume: '',
+                owner_present: false,
+                finished: false,
+                start_travel: false,
+                startLat: '',
+                startLong: '',
+                endLat: '',
+                endLong: ''
+            })
+        })
+        alert('Nova visita adicionada!')
+    }
+
+    newSchedule () {
+        Alert.alert(
+          'Adicionar Visita',
+          'Deseja adicionar uma visita a está fazenda?',
+          [
+            {text: 'Cancel', onPress: () => false , style: 'cancel'},
+            {text: 'OK', onPress: () => this.writeSchedule()},
+          ],
+          { cancelable: false }
+        )
     }
 
     wholeProduction() {
@@ -118,6 +152,10 @@ export default class AgendaDetail extends Component {
                 		</Text>
                 	</View>
                     <Graphic data={ this.state.productions } />
+                    <ActionButton
+                        buttonColor="rgba(231,76,60,1)"
+                        onPress={() => this.newSchedule()}
+                    />
                 </Card>
                 <Card>
                     <View style={styles.title}>

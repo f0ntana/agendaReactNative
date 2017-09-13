@@ -11,10 +11,10 @@ import Sync from './components/sync/sync';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const CustomDrawerContentComponent = props => (
-	<View style={{ flex: 1, backgroundColor: '#b1b6bb' }}>
+	<View style={{ flex: 1 }}>
 		<View style={{ marginTop: 40, justifyContent: 'center', alignItems: 'center' }}>
 			<Image
-				source={require('./images/logo2.png')}
+				source={require('./images/petrovina.png')}
 				style={{ width: SCREEN_WIDTH * 0.57 }}
 				resizeMode="contain"
 			/>
@@ -48,16 +48,16 @@ const MainRoot = DrawerNavigator(
 			path: '/login',
 			screen: Login,
 			navigationOptions: ({navigation}) => ({
-				drawerLockMode: 'locked-closed'
-		    })
+				drawerLockMode: 'locked-closed',
+		    }),
 		}
 	},
 	{
 		initialRouteName: 'Login',
 		contentOptions: {
-			activeTintColor: '#548ff7',
+			activeTintColor: '#338927',
 			activeBackgroundColor: 'transparent',
-			inactiveTintColor: '#ffffff',
+			inactiveTintColor: 'gray',
 			inactiveBackgroundColor: 'transparent',
 			labelStyle: {
 				fontSize: 15,

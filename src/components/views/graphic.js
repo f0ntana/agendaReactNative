@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet , View, Text } from 'react-native'
 import Svg from "react-native-svg"
-import { VictoryBar } from "victory-native"
+import { VictoryBar,VictoryLabel } from "victory-native"
 import _ from 'lodash'
 import realm from '../../models/schemas'
 
@@ -27,7 +27,14 @@ export default class Graphic extends Component {
             let dataGraphic = [1,2,3,4,5,6];
 
             Object.keys(summary).forEach((production, index) => {
-                dataGraphic.push({ x: ((index+1)), y: summary[production], label: (`${realm.objects('Crop').filtered('id = ' + production)[0].name} \n \n ${Math.round(summary[production])} sc`), fill: "green" })
+                let name = realm.objects('Crop').filtered('id = ' + production)[0].name
+                let sc =  Math.round(summary[production]) + ' sc'
+                dataGraphic.push({
+                    x: ((index+1)),
+                    y: summary[production],
+                    label: [sc, name],
+                    fill: "green"
+                })
             })
 
             this.setState({ dataGraphic: dataGraphic })
@@ -37,10 +44,11 @@ export default class Graphic extends Component {
     render() {
         return(
             <View style={styles.container}>
-                <Text style={ styles.titleText, { marginTop: 20 } }>Evolução de compra</Text>
+                <Text style={ styles.titleText }>Evolução de compra</Text>
                 <VictoryBar
                     style={{ data: { fill: "white", opacity: 0.5 } }}
                     data={this.state.dataGraphic}
+                    labelComponent={<VictoryLabel lineHeight="3" />}
                 />
                 <Text style={{textAlign: 'right', fontStyle : 'italic', fontSize: 12 }}>Volume em Sacas 40KG</Text>
             </View>
@@ -55,7 +63,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     titleText: {
-        fontSize: 16
+        fontSize: 16,
+        marginTop: 20
     },
     chart: {
         width: 200,

@@ -57,11 +57,10 @@ class PlaceHome extends Component {
 			<View style={styles.container}>
 				<View style={styles.title}>
 					<View style={styles.viewTitle}>
-						<Text style={styles.textTitle}>Listagem das fazendas</Text>
 						<Text style={styles.searchText}>Digite aqui a fazenda ou proprietário:</Text>
 					</View>
 					<TextInput
-				        style={{ height: 40, borderWidth: 1, marginLeft: 10, marginRight: 10, alignItems: 'stretch'}}
+				        style={{ height: 40, borderWidth: 1, marginLeft: 5, marginRight: 5, alignItems: 'stretch'}}
 				        onChangeText={(text) => this.filterList(text)}
 				        value={this.state.text}
 				    />
@@ -83,7 +82,8 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	viewTitle: {
-		alignItems: 'center'
+		alignItems: 'center',
+		margin: 5
 	},
 	title: {
 		justifyContent: 'center',

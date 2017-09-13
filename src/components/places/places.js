@@ -21,7 +21,7 @@ const Place = StackNavigator({
         screen: PlaceView,
         path: '/',
         navigationOptions: ({ navigation }) => ({
-            title: 'FAZENDA',
+            title: 'FAZENDAS',
             headerLeft: (
                 <Icon
                     name="menu"
@@ -44,7 +44,7 @@ const Place = StackNavigator({
         screen: AgendaProductionView,
         path: '/place_production',
         navigationOptions: {
-            title: 'FAZENDA DETALHE',
+            title: 'FAZENDA INFORMAÇÕES',
         },
     },
 })
