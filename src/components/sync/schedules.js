@@ -21,6 +21,7 @@ export default saveSchedules = (items) => {
                 startLong: item.startLong ? String(item.startLong) : '',
                 endLat: item.endLat ? String(item.endLat) : '',
                 endLong: item.endLong ? String(item.endLong) : '',
+                new: false
             })
         })
         resolve()

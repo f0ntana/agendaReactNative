@@ -48,7 +48,7 @@ export default class Graphic extends Component {
                 <VictoryBar
                     style={{ data: { fill: "white", opacity: 0.5 } }}
                     data={this.state.dataGraphic}
-                    labelComponent={<VictoryLabel lineHeight="3" />}
+                    labelComponent={<VictoryLabel lineHeight="2" style={{ fontSize: 10, height: 40 }} />}
                 />
                 <Text style={{textAlign: 'right', fontStyle : 'italic', fontSize: 12 }}>Volume em Sacas 40KG</Text>
             </View>
@@ -64,10 +64,7 @@ const styles = StyleSheet.create({
     },
     titleText: {
         fontSize: 16,
-        marginTop: 20
-    },
-    chart: {
-        width: 200,
-        height: 200,
+        marginTop: 20,
+        marginBottom: 20
     }
 })

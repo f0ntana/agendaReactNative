@@ -31,11 +31,12 @@ export default class AgendaDetail extends Component {
         navigate('Place_Production', data)
     }
 
-
     writeSchedule() {
         realm.write(() => {
+            let schedules = realm.objects('Schedule').sorted('id', true);
+            let highestId = schedules[0].id;
             realm.create('Schedule', {
-                id: 0,
+                id: (highestId + 1),
                 place_id: this.state.params.id,
                 name: 'Visita Exporádica',
                 date: moment().toDate(),
@@ -47,7 +48,8 @@ export default class AgendaDetail extends Component {
                 startLat: '',
                 startLong: '',
                 endLat: '',
-                endLong: ''
+                endLong: '',
+                new: true
             })
         })
         alert('Nova visita adicionada!')

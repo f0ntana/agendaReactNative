@@ -127,7 +127,7 @@ class SyncView extends Component {
 				<Text>Atualização Fazendas: {this.state.isUpdateProductions ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Atualização Questionário: {this.state.isUpdateAnswersProduction ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Safras: {this.state.isCropsInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Cultivars: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Cultivares: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Marcas de Sementes: {this.state.isSeedBrandsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Fazendas: {this.state.isPlacesInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Produções: {this.state.isProductionsInSync ? 'Finalizado' : 'Aguardando'}</Text>

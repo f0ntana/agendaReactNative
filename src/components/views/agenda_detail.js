@@ -49,7 +49,6 @@ export default class AgendaDetail extends Component {
         this.setState({ isModalVisible: false })
     }
 
-
     getPosition() {
         this.setState({ isLoading : true })
         navigator.geolocation.getCurrentPosition(
@@ -70,18 +69,20 @@ export default class AgendaDetail extends Component {
                         schedule.endLong = String(this.state.longitude)
                         schedule.finished = true
                         this.setState({ finished: true })
+                        this.props.navigation.state.params.changeFinished(schedule)
                         return this._showModal()
                     }
                     schedule.startLat = String(this.state.latitude)
                     schedule.startLong = String(this.state.longitude)
                     schedule.start_travel = true
+                    this.props.navigation.state.params.changeColor(schedule)
                     this.setState({ start_travel: true  })
                     return alert('Visita iniciada')
                 })
                 this.setState({ isLoading : false })
             },
             (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: true, timeout: 2000, maximumAge: 1000 },
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 2000 },
         )
     }
 

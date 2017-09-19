@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, StyleSheet, Platform, TouchableHighlight } from 'react-native'
+import { View, ScrollView, StyleSheet, Platform, TouchableHighlight, Linking } from 'react-native'
 import { Text, Button, Icon, SocialIcon, Card } from 'react-native-elements';
 import { Agenda, LocaleConfig } from 'react-native-calendars'
 import _ from 'lodash'
@@ -59,6 +59,7 @@ class AgendaHome extends Component {
 	}
 
 	loadItems(day) {
+		let now = moment(NOW).format('YYYY-MM-DD')
 		let scheduleItems = realm.objects('Schedule')
 
 		var grouped = _.groupBy(scheduleItems, function(item) {
@@ -66,34 +67,80 @@ class AgendaHome extends Component {
 			return date
 		})
 
-		if(scheduleItems.length == 0)
-		{
-			grouped = []
-			let now = moment(NOW).format('YYYY-MM-DD')
+		if (scheduleItems.length == 0 || !grouped[now] ) {
 			grouped[now] = []
 		}
-
 		this.setState({
 			items: grouped
 		})
 	}
 
+	changeColor(agenda){
+		let oldItems = this.state.items;
+		this.setState({ items : {} })
+		let items = oldItems[moment(agenda.date).format('YYYY-MM-DD')].map(item => {
+			if(item.id == agenda.id){
+				item.start_travel = true;
+			}
+			return item
+		})
+		oldItems[moment(agenda.date).format('YYYY-MM-DD')] = items
+		this.setState({ items : oldItems })
+	}
+
+	changeFinished(agenda){
+		let oldItems = this.state.items;
+		this.setState({ items : {} })
+		let items = oldItems[moment(agenda.date).format('YYYY-MM-DD')].map(item => {
+			if(item.id == agenda.id){
+				item.finished = true;
+			}
+			return item
+		})
+		oldItems[moment(agenda.date).format('YYYY-MM-DD')] = items
+		this.setState({ items : oldItems })
+	}
+
 	renderAgendaDetail(item) {
-		const { navigate } = this.props.navigation;
-		navigate('Agenda_Detail', item);
+		Linking.openURL('whatsapp://app')
+  		.catch(err => console.error('An error occurred', err));
+		// const { navigate } = this.props.navigation
+		// item.changeColor = this.changeColor.bind(this)
+		// item.changeFinished = this.changeFinished.bind(this)
+		// navigate('Agenda_Detail', item);
 	}
 
 	renderItem(item) {
 		return (
 			<View style={styles.item}>
 				<TouchableHighlight onPress={() => this.renderAgendaDetail(item)}>
-					<View>
-						<Text style={styles.itemText}>
-							{item.name}
-						</Text>
-						<Text style={styles.itemTextDescription}>
-							{item.description}
-						</Text>
+					<View style={{ flex:1, flexDirection: 'row' }}>
+						<View style={{ flex: 0.8 }}>
+							<Text style={styles.itemText}>
+								{item.name}
+							</Text>
+							<Text style={styles.itemTextDescription}>
+								{item.description}
+							</Text>
+						</View>
+						{item.start_travel && !item.finished &&
+							<View style={{ flex: 0.2 }}>
+								<Icon
+									name='car'
+									type='font-awesome'
+									color='green'
+								/>
+							</View>
+						}
+						{item.start_travel && item.finished &&
+							<View style={{ flex: 0.2 }}>
+								<Icon
+									name='check-circle-o'
+									type='font-awesome'
+									color='black'
+								/>
+							</View>
+						}
 					</View>
 				</TouchableHighlight>
 			</View>

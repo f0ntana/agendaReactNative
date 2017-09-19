@@ -15,5 +15,6 @@ Schedule.schema = {
 		startLong: 'string',
 		endLat: 'string',
 		endLong: 'string',
+		new: 'bool'
 	}
 }
