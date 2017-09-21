@@ -81,8 +81,12 @@ export default class AgendaDetail extends Component {
                 })
                 this.setState({ isLoading : false })
             },
-            (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: false, timeout: 20000, maximumAge: 2000 },
+            (error) => {
+                alert('Falha ao sincronizar GPS, tente novamente!')
+                this.setState({ error: error.message })
+                this.setState({ isLoading : false })
+            },
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 300 },
         )
     }
 

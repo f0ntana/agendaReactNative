@@ -102,20 +102,27 @@ class AgendaHome extends Component {
 	}
 
 	renderAgendaDetail(item) {
-		Linking.openURL('whatsapp://app')
-  		.catch(err => console.error('An error occurred', err));
-		// const { navigate } = this.props.navigation
-		// item.changeColor = this.changeColor.bind(this)
-		// item.changeFinished = this.changeFinished.bind(this)
-		// navigate('Agenda_Detail', item);
+		const { navigate } = this.props.navigation
+		item.changeColor = this.changeColor.bind(this)
+		item.changeFinished = this.changeFinished.bind(this)
+		navigate('Agenda_Detail', item);
 	}
 
 	renderItem(item) {
 		return (
 			<View style={styles.item}>
-				<TouchableHighlight onPress={() => this.renderAgendaDetail(item)}>
+				<TouchableHighlight onPress={	() => {
+							if(realm.objects('Place').filtered('id = ' + item.place_id).length > 0){
+								return this.renderAgendaDetail(item)
+							}
+							alert('Fazenda não alocada para o representante.')
+						}
+					} >
 					<View style={{ flex:1, flexDirection: 'row' }}>
 						<View style={{ flex: 0.8 }}>
+							<Text style={styles.itemTextDescription}>
+								Fazenda: { (realm.objects('Place').filtered('id = ' + item.place_id).length > 0) ? realm.objects('Place').filtered('id = ' + item.place_id)[0].name : 'Não definida'}
+							</Text>
 							<Text style={styles.itemText}>
 								{item.name}
 							</Text>

@@ -34,9 +34,13 @@ export default class AgendaDetail extends Component {
     writeSchedule() {
         realm.write(() => {
             let schedules = realm.objects('Schedule').sorted('id', true);
-            let highestId = schedules[0].id;
+            let highestId = 1
+            if(schedules.length > 0 ){
+                highestId = (schedules[0].id + 1)
+            }
+
             realm.create('Schedule', {
-                id: (highestId + 1),
+                id: highestId,
                 place_id: this.state.params.id,
                 name: 'Visita Exporádica',
                 date: moment().toDate(),
