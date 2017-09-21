@@ -86,7 +86,7 @@ export default class AgendaDetail extends Component {
                 this.setState({ error: error.message })
                 this.setState({ isLoading : false })
             },
-            { enableHighAccuracy: false, timeout: 20000, maximumAge: 300 },
+            { enableHighAccuracy: false, timeout: 60000, maximumAge: 300 },
         )
     }
 
