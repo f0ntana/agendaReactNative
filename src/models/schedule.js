@@ -6,6 +6,8 @@ Schedule.schema = {
 		place_id: 'int',
 		name: 'string',
 		date: 'date',
+		startTravelDate: { type: 'date', optional: true},
+		endTravelDate: { type: 'date', optional: true},
 		description: 'string',
 		resume: 'string',
 		owner_present: 'bool',

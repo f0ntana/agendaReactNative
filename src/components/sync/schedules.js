@@ -12,6 +12,8 @@ export default saveSchedules = (items) => {
                 place_id: item.place_id,
                 name: item.name,
                 date: moment(item.date).toDate(),
+                startTravelDate: item.startTravelDate ? moment(item.startTravelDate).toDate() : null,
+                endTravelDate: item.endTravelDate ? moment(item.endTravelDate).toDate() : null,
                 description: item.description,
                 resume: item.resume || '',
                 owner_present: item.owner_present ? true : false,

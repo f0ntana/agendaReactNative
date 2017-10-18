@@ -67,6 +67,7 @@ export default class AgendaDetail extends Component {
                     if (schedule.start_travel) {
                         schedule.endLat = String(this.state.latitude)
                         schedule.endLong = String(this.state.longitude)
+                        schedule.endTravelDate = moment().toDate()
                         schedule.finished = true
                         this.setState({ finished: true })
                         this.props.navigation.state.params.changeFinished(schedule)
@@ -74,6 +75,7 @@ export default class AgendaDetail extends Component {
                     }
                     schedule.startLat = String(this.state.latitude)
                     schedule.startLong = String(this.state.longitude)
+                    schedule.startTravelDate = moment().toDate()
                     schedule.start_travel = true
                     this.props.navigation.state.params.changeColor(schedule)
                     this.setState({ start_travel: true  })
@@ -82,11 +84,11 @@ export default class AgendaDetail extends Component {
                 this.setState({ isLoading : false })
             },
             (error) => {
-                alert('Falha ao sincronizar GPS, tente novamente!')
+                alert('Falha ao sincronizar GPS ou GPS desligado, tente novamente!')
                 this.setState({ error: error.message })
                 this.setState({ isLoading : false })
             },
-            { enableHighAccuracy: false, timeout: 60000, maximumAge: 300 },
+            { enableHighAccuracy: false, timeout: 60000},
         )
     }
 
@@ -97,6 +99,11 @@ export default class AgendaDetail extends Component {
             data = { new: true, place_id: this.props.navigation.state.params.place_id }
         }
         navigate('Agenda_Production', data)
+    }
+
+    renderQuestions () {
+        const { navigate } = this.props.navigation
+        navigate('Agenda_Questions', this.state.place)
     }
 
   	render() {
@@ -161,9 +168,18 @@ export default class AgendaDetail extends Component {
                     icon={this.state.schedule.finished ? {name: 'ban', type: 'font-awesome'} : {name: 'cached'}}
                     title={ this.state.schedule.finished ? 'Finalizada' : this.state.schedule.start_travel ? 'Finalizar Visita': 'Iniciar Visita'}
                     backgroundColor={this.state.schedule.start_travel ? 'red': 'green'}
-                    style={{ marginTop: 5, borderRadius: 4, borderColor: 'rgba(0, 0, 0, 0.1)'}}
+                    style={{ borderRadius: 4, borderColor: 'rgba(0, 0, 0, 0.1)'}}
                     onPress={ () => this.getPosition() }
                 />
+                <Card>
+                    <View>
+                        <Button
+                            backgroundColor='lightblue'
+                            title='Questionário'
+                            onPress={ () => this.renderQuestions() }
+                        />
+                    </View>
+                </Card>
                 <Card>
                     <View style={styles.title}>
                         <Text style={styles.titleText}>INFORMAÇÕES</Text>

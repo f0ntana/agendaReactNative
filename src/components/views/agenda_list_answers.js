@@ -8,9 +8,9 @@ export default class ListAnswers extends Component {
     constructor(props) {
         super(props)
 
-        let answersProduction = realm.objects('AnswerProduction').filtered(`production_id = ${this.props.production}`)
+        let answersPlace = realm.objects('AnswerPlace').filtered(`place_id = ${this.props.place}`).filtered(`crop_id = ${this.props.crop}`)
 
-        let arrAnswersProduction = answersProduction.reduce((acc,item) => {
+        let arrAnswersPlace = answersPlace.reduce((acc,item) => {
             return acc.concat(item.answer_id)
         }, [])
 
@@ -21,7 +21,7 @@ export default class ListAnswers extends Component {
         let answersCheck = data.filter( item => {
             return item.question_id == this.props.question
         }).map((a, b) => {
-            organized[a.id] = arrAnswersProduction.includes(a.id) ? true : false
+            organized[a.id] = arrAnswersPlace.includes(a.id) ? true : false
             return a
         })
 

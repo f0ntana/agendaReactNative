@@ -133,11 +133,6 @@ export default class AgendaProduction extends Component {
         }
     }
 
-    renderQuestions () {
-        const { navigate } = this.props.navigation
-        navigate('Agenda_Questions', this.state.production)
-    }
-
     saveChanges() {
         var value = this.refs.form.getValue()
         if (value) {
@@ -185,14 +180,6 @@ export default class AgendaProduction extends Component {
         return (
             <ScrollView style={styles.container}>
                 <Card title="Informações">
-                    <View style={{ marginBottom: 20, alignItems: 'flex-end' }}>
-                        <Button
-                            raised
-                            backgroundColor='green'
-                            title='Questionário'
-                            onPress={ () => this.renderQuestions() }
-                        />
-                    </View>
                     <View style={styles.title}>
                         <Text style={styles.titleText}>
                             DESCRIÇÃO

@@ -8,7 +8,7 @@ import Production from './production'
 import SeedBrand from './seedBrand'
 import Question from './question'
 import Answer from './answer'
-import AnswerProduction from './answerProduction'
+import AnswerPlace from './answerPlace'
 
 
 const schemas = new Realm({
@@ -21,7 +21,7 @@ const schemas = new Realm({
         SeedBrand,
         Question,
         Answer,
-        AnswerProduction
+        AnswerPlace
 	]
 })
 

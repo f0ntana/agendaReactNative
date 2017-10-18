@@ -37,10 +37,10 @@ export const API = {
         return response
     },
 
-    updateSyncAnswersProduction(payload) {
+    updateSyncAnswersPlace(payload) {
         let data = JSON.stringify( payload )
         let response = AsyncStorage.getItem('_token').then((value) => {
-            return fetch(API_BASE + 'sync-answers-productions-from-app', {
+            return fetch(API_BASE + 'sync-answers-places-from-app', {
                 method: 'post',
                 body: data,
                 headers: {

@@ -23,7 +23,7 @@ class SyncView extends Component {
 		this.state = {
 			isUpdateProductions: false,
 			isUpdateSchedules: false,
-			isUpdateAnswersProduction: false,
+			isUpdateAnswersPlace: false,
 			isSchedulesInSync: false,
 			isCropsInSync: false,
 			isCultivarsInSync: false,
@@ -63,21 +63,29 @@ class SyncView extends Component {
 			this.setState({ isUpdateProductions: true })
 		})
 
-
 		//ENVIAR ATUALIZAÇÕES DAS RESPOSTAS DAS PRODUÇÕES PARA O SERVIDOR
-		let answersProduction = realm.objects('AnswerProduction')
-		let itemsAnswersProduction = _.reduce(answersProduction, (obj,param)  => {
-			obj[param.id] = param
-			return obj
-		}, {});
+		let answersPlace = realm.objects('AnswerPlace')
+		if(answersPlace.length > 0 ) {
+			let itemsAnswersPlace = _.reduce(answersPlace, (obj,param)  => {
+				obj[param.id] = param
+				return obj
+			}, {});
 
-		console.log(itemsAnswersProduction)
-		await API.updateSyncAnswersProduction(itemsAnswersProduction)
-		.then(response => response.json())
-		.then(response => {
-			console.log(response)
-			this.setState({ isUpdateAnswersProduction: true })
-		})
+			console.log('itemsAnswersPlace', itemsAnswersPlace)
+			await API.updateSyncAnswersPlace(itemsAnswersPlace)
+			.then(response => response.json())
+			.then(response => {
+				if(response.schedules == true){
+					realm.write(() => {
+						let all = realm.objects('AnswerPlace')
+	        			realm.delete(all)
+	        		})
+				}
+				this.setState({ isUpdateAnswersPlace: true })
+			})
+		} else {
+			this.setState({ isUpdateAnswersPlace: true })
+		}
 
 		await API.getSync()
 		.then(response => response.json())
@@ -125,7 +133,7 @@ class SyncView extends Component {
 				<Text style={styles.title}>Status Sincronização:</Text>
 				<Text>Atualização Agenda: {this.state.isUpdateSchedules ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Atualização Fazendas: {this.state.isUpdateProductions ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Atualização Questionário: {this.state.isUpdateAnswersProduction ? 'Finalizado' : 'Aguardando'}</Text>
+				<Text>Atualização Questionário: {this.state.isUpdateAnswersPlace ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Safras: {this.state.isCropsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Cultivares: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>
 				<Text>Marcas de Sementes: {this.state.isSeedBrandsInSync ? 'Finalizado' : 'Aguardando'}</Text>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, StyleSheet, Text} from 'react-native'
+import { ScrollView, StyleSheet, Text, Picker} from 'react-native'
 import { Card, CheckBox, Button} from 'react-native-elements'
 import realm from '../../models/schemas'
 import _ from 'lodash'
@@ -10,12 +10,15 @@ export default class AgendaQuestions extends Component {
         super(props)
         let questions = realm.objects('Question')
         let answers = realm.objects('Answer')
+        let crops = realm.objects('Crop').sorted('id', 'DESC')
         this.state = {
+            crops : crops,
             questions : questions,
             answers : answers,
             checkedAnswers: {},
             checked: true,
-            organized: {}
+            organized: {},
+            cropId: crops[0].id
         }
     }
 
@@ -26,9 +29,8 @@ export default class AgendaQuestions extends Component {
     }
 
     saveChanges() {
-        let productionId = this.props.navigation.state.params.id
+        let placeId = this.props.navigation.state.params.id
         let checkedAnswers = this.state.checkedAnswers
-
 
         let filterChecked = _.flatten(_.values(checkedAnswers).map(function (answers) {
             return Object.keys(answers).filter(function (k) {
@@ -38,18 +40,16 @@ export default class AgendaQuestions extends Component {
 
         realm.write(() => {
             let retNext = 1
-            let lastItem = realm.objects('AnswerProduction').sorted('id', 'DESC')[0]
+            let lastItem = realm.objects('AnswerPlace').sorted('id', 'DESC')[0]
             if (lastItem) {
                 retNext  = Number(lastItem.id) + 1
             }
 
-            let all = realm.objects('AnswerProduction')
-            realm.delete(all)
-
             filterChecked.map((answerId) => {
-                realm.create('AnswerProduction', {
+                realm.create('AnswerPlace', {
                     id: retNext,
-                    production_id: productionId,
+                    place_id: placeId,
+                    crop_id: this.state.cropId,
                     answer_id: Number(answerId),
                 })
                 retNext++
@@ -62,11 +62,19 @@ export default class AgendaQuestions extends Component {
     render() {
         return (
             <ScrollView style={styles.container}>
+                <Card>
+                    <Text>Selecione a safra:</Text>
+                    <Picker
+                        selectedValue={this.state.cropId}
+                        onValueChange={(cropId) => this.setState({ cropId: cropId })}>
+                        { this.state.crops.map((l, i) => <Picker.Item  key={i} label={l.name} value={l.id} />)}
+                    </Picker>
+                </Card>
                 {
                     this.state.questions.map((l, i) => (
                         <Card key={i}>
                             <Text style={styles.question}>{l.description}</Text>
-                            <ListAnswers production={this.props.navigation.state.params.id} question={ l.id } answers={ this.state.answers } onCheck={(answers) => this.setAnswer(l.id, answers)}/>
+                            <ListAnswers crop={this.state.cropId} place={this.props.navigation.state.params.id} question={ l.id } answers={ this.state.answers } onCheck={(answers) => this.setAnswer(l.id, answers)}/>
                         </Card>
                     ))
                 }
