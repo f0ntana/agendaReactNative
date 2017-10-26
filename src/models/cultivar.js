@@ -4,7 +4,6 @@ Cultivar.schema = {
 	properties: {
 		id: 'int',
 		name: 'string',
-		cycle: 'string',
 		transgenic: 'bool',
 	}
 }

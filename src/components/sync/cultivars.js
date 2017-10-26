@@ -9,7 +9,6 @@ export default saveCultivars = (items) => {
             let cultivar = realm.create('Cultivar', {
                 id: item.id,
                 name: item.name,
-                cycle: item.cycle ? item.cycle : '0',
                 transgenic: item.transgenic ? true : false
             })
         })

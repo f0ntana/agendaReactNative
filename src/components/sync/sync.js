@@ -46,7 +46,6 @@ class SyncView extends Component {
 		await API.updateSyncSchedules(itemsSchedules)
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
 			this.setState({ isUpdateSchedules: true })
 		})
 
@@ -87,19 +86,34 @@ class SyncView extends Component {
 			this.setState({ isUpdateAnswersPlace: true })
 		}
 
-		await API.getSync()
+		//RECEBER AS SAFRAS
+		await API.getSyncCrops()
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
 			realm.write(() => {
 				saveCrops(response.crops).then( () => {
 		            this.setState({ isCropsInSync: true })
 		        })
+			})
+		})
 
-		        saveCultivars(response.cultivars).then( () => {
+		//RECEBER AS CULTURAS
+		await API.getSyncCultivars()
+		.then(response => response.json())
+		.then(response => {
+			console.error(response)
+			realm.write(() => {
+				saveCultivars(response.cultivars).then( () => {
 		            this.setState({ isCultivarsInSync: true })
 		        })
+			})
+		})
 
+		//RECEBER OS PARÊMETROS
+		await API.getSync()
+		.then(response => response.json())
+		.then(response => {
+			realm.write(() => {
 		        saveSeedBrands(response.seedBrands).then( () => {
 		            this.setState({ isSeedBrandsInSync: true })
 		        })

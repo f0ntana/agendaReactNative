@@ -67,6 +67,39 @@ export const API = {
         return response
     },
 
+    getSyncCrops() {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-crops', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+    getSyncCultivars() {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-cultivars', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+
+        console.log(response)
+        console.log(response.cultivars)
+        console.error(response)
+        console.error(response.cultivars)
+        return response
+    },
+
     postLogin(payload) {
         let data = JSON.stringify( payload )
         return fetch(API_BASE + 'login', {
