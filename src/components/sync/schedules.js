@@ -3,7 +3,6 @@ import moment from 'moment'
 
 export default saveSchedules = (items) => {
     let promise = new Promise( (resolve, reject) => {
-        console.log('Sincronizando Agenda')
         let all = realm.objects('Schedule')
         realm.delete(all)
         items.map(item => {

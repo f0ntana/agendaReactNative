@@ -9,6 +9,7 @@ import SeedBrand from './seedBrand'
 import Question from './question'
 import Answer from './answer'
 import AnswerPlace from './answerPlace'
+import LastSync from './lastSync'
 
 
 const schemas = new Realm({
@@ -21,7 +22,8 @@ const schemas = new Realm({
         SeedBrand,
         Question,
         Answer,
-        AnswerPlace
+        AnswerPlace,
+        LastSync
 	]
 })
 

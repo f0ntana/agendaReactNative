@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { StackNavigator } from 'react-navigation'
-import {Grid, Col, Icon} from 'react-native-elements';
+import { Icon , List, ListItem} from 'react-native-elements';
 
 import _ from 'lodash'
 import { API } from '../../utils/api'
 import realm from '../../models/schemas'
+import moment from 'moment'
 
 import saveCrops from './crops'
 import saveCultivars from './cultivars'
@@ -15,6 +16,7 @@ import saveProductions from './productions'
 import saveSeedBrands from './seedBrands'
 import saveQuestions from './questions'
 import saveAnswers from './answers'
+import saveLastSync from './saveLastSync'
 
 class SyncView extends Component {
 
@@ -31,11 +33,22 @@ class SyncView extends Component {
 			isProductionsInSync: false,
 			isSeedBrandsInSync: false,
 			isQuestionsInSync: false,
-			isAnswersInSync: false
+			isAnswersInSync: false,
+			isLastSyncInSync: false
 		}
 	}
 
 	async componentDidMount() {
+
+		let lastDateSync = realm.objects('LastSync').filtered('id = 1')[0].date
+
+		if(!lastDateSync) {
+			lastDateSync = 0
+		}
+
+		if(lastDateSync){
+			lastDateSync = moment(lastDateSync).toISOString()
+		}
 
 		//ENVIAR ATUALIZAÇÕES DA AGENDA PARA O SERVIDOR
 		let schedules = realm.objects('Schedule')
@@ -51,7 +64,7 @@ class SyncView extends Component {
 
 
 		//ENVIAR ATUALIZAÇÕES DAS PRODUÇÕES PARA O SERVIDOR
-		let productions = realm.objects('Production')
+		let productions = realm.objects('Production').filtered('needSync = true')
 		let itemsProductions = productions.reduce( (acc, x) => {
 			acc[x.id] = x
 			return acc
@@ -70,7 +83,6 @@ class SyncView extends Component {
 				return obj
 			}, {});
 
-			console.log('itemsAnswersPlace', itemsAnswersPlace)
 			await API.updateSyncAnswersPlace(itemsAnswersPlace)
 			.then(response => response.json())
 			.then(response => {
@@ -101,7 +113,6 @@ class SyncView extends Component {
 		await API.getSyncCultivars()
 		.then(response => response.json())
 		.then(response => {
-			console.error(response)
 			realm.write(() => {
 				saveCultivars(response.cultivars).then( () => {
 		            this.setState({ isCultivarsInSync: true })
@@ -109,53 +120,95 @@ class SyncView extends Component {
 			})
 		})
 
-		//RECEBER OS PARÊMETROS
-		await API.getSync()
+		//RECEBER AS MARCAS DE SEMENTES
+		await API.getSyncSeedBrands()
 		.then(response => response.json())
 		.then(response => {
 			realm.write(() => {
-		        saveSeedBrands(response.seedBrands).then( () => {
+				saveSeedBrands(response.seedBrands).then( () => {
 		            this.setState({ isSeedBrandsInSync: true })
 		        })
+			})
+		})
 
-		        savePlaces(response.places).then( (resp) => {
+		//RECEBER FAZENDAS
+		await API.getSyncPlaces(lastDateSync)
+		.then(response => response.json())
+		.then(response => {
+			realm.write(() => {
+				savePlaces(response.places).then( (resp) => {
 		            this.setState({ isPlacesInSync: true })
 		        })
+			})
+		})
 
+		//RECEBER PRODUÇÕES
+		await API.getSyncProductions(lastDateSync)
+		.then(response => response.json())
+		.then(response => {
+			realm.write(() => {
+				saveProductions(response.productions).then( () => {
+		            this.setState({ isProductionsInSync: true })
+		        })
+			})
+		})
+
+		//RECEBER VISITAS
+		await API.getSyncSchedules()
+		.then(response => response.json())
+		.then(response => {
+			realm.write(() => {
 				saveSchedules(response.schedules).then( () => {
 		            this.setState({ isSchedulesInSync: true })
 		        })
+			})
+		})
 
-		        saveProductions(response.productions).then( () => {
-		            this.setState({ isProductionsInSync: true })
-		        })
-
-		        saveQuestions(response.questions).then( () => {
+		//RECEBER VISITAS
+		await API.getSyncQuestions()
+		.then(response => response.json())
+		.then(response => {
+			realm.write(() => {
+				saveQuestions(response.questions).then( () => {
 		            this.setState({ isQuestionsInSync: true })
 		        })
+			})
+		})
 
+		//RECEBER OS RESPOSTAS
+		await API.getSyncAnswers()
+		.then(response => response.json())
+		.then(response => {
+			realm.write(() => {
 		        saveAnswers(response.answers).then( () => {
 		            this.setState({ isAnswersInSync: true })
 		        })
 			})
+		})
+
+		await saveLastSync()
+		.then( () => {
+			this.setState({ isLastSyncInSync: true })
 		})
 	}
 
 	render() {
 		return (
 			<View style={styles.container}>
-				<Text style={styles.title}>Status Sincronização:</Text>
-				<Text>Atualização Agenda: {this.state.isUpdateSchedules ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Atualização Fazendas: {this.state.isUpdateProductions ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Atualização Questionário: {this.state.isUpdateAnswersPlace ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Safras: {this.state.isCropsInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Cultivares: {this.state.isCultivarsInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Marcas de Sementes: {this.state.isSeedBrandsInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Fazendas: {this.state.isPlacesInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Produções: {this.state.isProductionsInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Agenda: {this.state.isSchedulesInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Perguntas: {this.state.isQuestionsInSync ? 'Finalizado' : 'Aguardando'}</Text>
-				<Text>Respostas: {this.state.isAnswersInSync ? 'Finalizado' : 'Aguardando'}</Text>
+				<List>
+					<ListItem hideChevron={true} title="Atualização Agenda" leftIcon={{ name: this.state.isUpdateSchedules ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Atualização Fazendas" leftIcon={{ name: this.state.isUpdateProductions ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Atualização Questionário" leftIcon={{ name: this.state.isUpdateAnswersPlace ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Safras" leftIcon={{ name: this.state.isCropsInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Cultivares" leftIcon={{ name: this.state.isCultivarsInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Marcas de Sementes" leftIcon={{ name: this.state.isSeedBrandsInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Fazendas" leftIcon={{ name: this.state.isPlacesInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Produções" leftIcon={{ name: this.state.isProductionsInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Agenda" leftIcon={{ name: this.state.isSchedulesInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Perguntas" leftIcon={{ name: this.state.isQuestionsInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Respostas" leftIcon={{ name: this.state.isAnswersInSync ? 'check' : 'cached' }} />
+					<ListItem hideChevron={true} title="Recursos" leftIcon={{ name: this.state.isLastSyncInSync ? 'check' : 'cached' }} />
+				</List>
 			</View>
 		)
 	}
@@ -200,14 +253,7 @@ Sync.navigationOptions = {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		paddingTop: 20,
-		alignItems: 'center'
-	},
-	title: {
-		padding: 20,
-		fontWeight: '700',
-		fontSize: 16
+		flex: 1
 	}
 })
 

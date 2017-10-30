@@ -3,11 +3,12 @@ import realm from '../../models/schemas'
 
 export default saveProductions =  (items) => {
     let promise = new Promise( (resolve, reject) => {
-        console.log('Sincronizando Produções')
-        let all = realm.objects('Production')
-        realm.delete(all)
-        items.map(item => {
-            let productions = realm.create('Production', {
+        items.map( item => {
+            let production = realm.objects('Production').filtered(`id = ${item.id}`)[0]
+            if (production) {
+                realm.delete(all)
+            }
+            production = realm.create('Production', {
                 id: item.id,
                 place_id: item.place_id,
                 cultivar_id: item.cultivar_id,
@@ -30,7 +31,8 @@ export default saveProductions =  (items) => {
                 desiccation: item.desiccation ? true : false,
                 type: item.type || 0,
                 finished: item.finished ? true : false,
-                new: false
+                new: false,
+                needSync: false
             })
         })
         resolve()

@@ -92,11 +92,91 @@ export const API = {
                 }
             })
         })
+        return response
+    },
 
-        console.log(response)
-        console.log(response.cultivars)
-        console.error(response)
-        console.error(response.cultivars)
+    getSyncSeedBrands() {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-seed-brands', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+    getSyncPlaces(lastDateSync) {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-places/' + lastDateSync, {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+    getSyncSchedules() {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-schedules', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+    getSyncProductions(lastDateSync) {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-productions/' + lastDateSync, {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+    getSyncQuestions() {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-questions', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
+        return response
+    },
+
+
+    getSyncAnswers() {
+        let response = AsyncStorage.getItem('_token').then((value) => {
+            return fetch(API_BASE + 'schedule-sync-answers', {
+                method: 'get',
+                headers: {
+                    'Authorization': 'Bearer ' + value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+        })
         return response
     },
 

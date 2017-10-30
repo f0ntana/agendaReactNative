@@ -2,10 +2,12 @@ import realm from '../../models/schemas'
 
 export default savePlaces = (items) => {
     let promise = new Promise( (resolve, reject) => {
-        let all = realm.objects('Place')
-        realm.delete(all)
         items.map(item => {
-            let place = realm.create('Place', {
+            let place = realm.objects('Place').filtered(`id = ${item.id}`)[0]
+            if (place) {
+                realm.delete(all)
+            }
+            place = realm.create('Place', {
                 id: item.id,
                 client_id: item.client.id,
                 client_name: item.client.name || " ",

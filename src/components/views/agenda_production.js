@@ -137,7 +137,6 @@ export default class AgendaProduction extends Component {
         var value = this.refs.form.getValue()
         if (value) {
             realm.write(() => {
-
                 let data = {
                     place_id: parseInt(this.state.place.id),
                     crop_id: parseInt(value.crop_id),
@@ -161,6 +160,7 @@ export default class AgendaProduction extends Component {
                     type: this.state.production.type || 0,
                     finished: this.state.production.finished || false,
                     new: this.state.production.new || false,
+                    needSync: true,
                 }
 
                 if (this.state.newProduction == false) {

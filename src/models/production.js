@@ -24,6 +24,7 @@ Production.schema = {
         desiccation: 'bool',
         type: 'int',
         finished: 'bool',
-        new: 'bool'
+        new: 'bool',
+        needSync : 'bool'
     }
 }
