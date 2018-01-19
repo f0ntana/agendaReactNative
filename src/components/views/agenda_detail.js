@@ -15,8 +15,8 @@ import ListProductions from './agenda_list_productions'
 export default class AgendaDetail extends Component {
 	constructor(props) {
         super(props)
-        var place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
-        var schedule = realm.objects('Schedule').filtered(`id = ${this.props.navigation.state.params.id}`)[0]
+        let place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
+        let schedule = realm.objects('Schedule').filtered(`id = ${this.props.navigation.state.params.id}`)[0]
         this.state = {
             schedule: schedule,
             place: place,
@@ -67,7 +67,7 @@ export default class AgendaDetail extends Component {
                     if (schedule.start_travel) {
                         schedule.endLat = String(this.state.latitude)
                         schedule.endLong = String(this.state.longitude)
-                        schedule.endTravelDate = moment().toDate()
+                        schedule.endTravelDate = moment().subtract(3, 'hours').toDate()
                         schedule.finished = true
                         this.setState({ finished: true })
                         this.props.navigation.state.params.changeFinished(schedule)
@@ -75,7 +75,7 @@ export default class AgendaDetail extends Component {
                     }
                     schedule.startLat = String(this.state.latitude)
                     schedule.startLong = String(this.state.longitude)
-                    schedule.startTravelDate = moment().toDate()
+                    schedule.startTravelDate = moment().subtract(3, 'hours').toDate()
                     schedule.start_travel = true
                     this.props.navigation.state.params.changeColor(schedule)
                     this.setState({ start_travel: true  })
@@ -88,7 +88,9 @@ export default class AgendaDetail extends Component {
                 this.setState({ error: error.message })
                 this.setState({ isLoading : false })
             },
-            { enableHighAccuracy: false, timeout: 60000},
+            {
+                enableHighAccuracy: false,
+            },
         )
     }
 
@@ -138,6 +140,15 @@ export default class AgendaDetail extends Component {
                 		<Text style={styles.infosText}>
 	                    	<Text style={{ fontWeight: 'bold' }}>Cliente: </Text> {this.state.place.client_name}
 	                    </Text>
+                        <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Inscrição: </Text> {this.state.place.inscription}
+                        </Text>
+                        <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Contato: </Text> {this.state.place.client_contact}
+                        </Text>
+                        <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Telefone: </Text> {this.state.place.client_phone}
+                        </Text>
                 		<Text style={styles.infosText}>
 	                    	<Text style={{ fontWeight: 'bold' }}>Fazenda: </Text> {this.state.place.name}
 	                    </Text>

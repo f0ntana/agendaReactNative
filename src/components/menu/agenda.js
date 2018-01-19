@@ -23,6 +23,10 @@ const Agenda = StackNavigator({
         path: '/',
         navigationOptions: ({ navigation }) => ({
             title: 'AGENDA',
+            headerTintColor: '#fff',
+            headerStyle: {
+                backgroundColor: '#00a65a',
+            },
             headerLeft: (
                 <Icon
                     name="menu"
@@ -30,6 +34,7 @@ const Agenda = StackNavigator({
                     type="entypo"
                     style={{ paddingLeft: 10 }}
                     onPress={() => navigation.navigate('DrawerOpen')}
+                    color="#fff"
                 />
             ),
         }),
@@ -39,6 +44,10 @@ const Agenda = StackNavigator({
         path: '/agenda_detail',
         navigationOptions: {
             title: 'AGENDA DETALHE',
+            headerTintColor: '#fff',
+            headerStyle: {
+                backgroundColor: '#00a65a',
+            },
         },
     },
     Agenda_Production: {
@@ -46,6 +55,10 @@ const Agenda = StackNavigator({
         path: '/agenda_production',
         navigationOptions: {
             title: 'DETALHE',
+            headerTintColor: '#fff',
+            headerStyle: {
+                backgroundColor: '#00a65a',
+            },
         },
     },
     Agenda_Questions: {
@@ -53,6 +66,10 @@ const Agenda = StackNavigator({
         path: '/agenda_questions',
         navigationOptions: {
             title: 'QUESTIONÁRIO',
+            headerTintColor: '#fff',
+            headerStyle: {
+                backgroundColor: '#00a65a',
+            },
         },
     },
 })

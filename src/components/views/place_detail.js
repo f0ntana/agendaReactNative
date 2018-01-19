@@ -13,7 +13,7 @@ export default class AgendaDetail extends Component {
         super(props)
         this.state = {
             params: this.props.navigation.state.params,
-            productions: {},
+            productions: {}
         }
     }
 
@@ -43,7 +43,7 @@ export default class AgendaDetail extends Component {
                 id: highestId,
                 place_id: this.state.params.id,
                 name: 'Visita Exporádica',
-                date: moment().toDate(),
+                date: moment().subtract(3, 'hours').toDate(),
                 description: 'Visita adicionada pelo App',
                 resume: '',
                 owner_present: false,
@@ -147,6 +147,15 @@ export default class AgendaDetail extends Component {
                 		<Text style={styles.infosText}>
 	                    	<Text style={{ fontWeight: 'bold' }}>Fazenda: </Text>{ this.state.params.name }
 	                    </Text>
+                         <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Inscrição: </Text> { this.state.params.inscription}
+                        </Text>
+                        <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Contato: </Text> { this.state.params.client_contact}
+                        </Text>
+                        <Text style={styles.infosText}>
+                            <Text style={{ fontWeight: 'bold' }}>Telefone: </Text> { this.state.params.client_phone}
+                        </Text>
                 		<Text style={styles.infosText}>
                 			<Text style={{ fontWeight: 'bold' }}>Endereço: </Text>{ this.state.params.address }
                 		</Text>

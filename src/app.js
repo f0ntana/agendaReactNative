@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, Dimensions, Text } from 'react-native';
+import { View, Image, Dimensions, Text} from 'react-native';
 import { DrawerNavigator, DrawerItems, StackNavigator } from 'react-navigation';
 
 import Login from './components/login/login';
@@ -53,9 +53,9 @@ const MainRoot = DrawerNavigator(
 		}
 	},
 	{
-		initialRouteName: 'Sync',
+		initialRouteName: 'Login',
 		contentOptions: {
-			activeTintColor: '#338927',
+			activeTintColor: '#00a65a',
 			activeBackgroundColor: 'transparent',
 			inactiveTintColor: 'gray',
 			inactiveBackgroundColor: 'transparent',

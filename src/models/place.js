@@ -4,7 +4,9 @@ Place.schema = {
 	properties: {
 		id: 'int',
 		client_id: 'int',
-		client_name: 'string',
+        client_name: 'string',
+        client_phone: 'string',
+		client_contact: 'string',
         name: 'string',
         address: 'string',
         itinerary: 'string',

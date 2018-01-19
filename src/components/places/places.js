@@ -29,6 +29,7 @@ const Place = StackNavigator({
                     type="entypo"
                     style={{ paddingLeft: 10 }}
                     onPress={() => navigation.navigate('DrawerOpen')}
+                    color="#fff"
                 />
             ),
         }),
@@ -38,6 +39,10 @@ const Place = StackNavigator({
         path: '/place_detail',
         navigationOptions: {
             title: 'FAZENDA DETALHE',
+            headerTintColor: '#fff',
+            headerStyle: {
+                backgroundColor: '#00a65a',
+            },
         },
     },
     Place_Production: {
@@ -45,12 +50,20 @@ const Place = StackNavigator({
         path: '/place_production',
         navigationOptions: {
             title: 'FAZENDA INFORMAÇÕES',
+            headerTintColor: '#fff',
+            headerStyle: {
+                backgroundColor: '#00a65a',
+            },
         },
     },
 })
 
 PlaceView.navigationOptions = {
   drawerLabel: 'Fazenda',
+  headerTintColor: '#fff',
+  headerStyle: {
+    backgroundColor: '#00a65a',
+  },
   drawerIcon: ({ tintColor }) => (
     <Icon
       name="leaf"

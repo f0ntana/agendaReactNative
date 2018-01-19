@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native'
 import { StackNavigator } from 'react-navigation';
-import { List, ListItem, Icon } from 'react-native-elements'
+import { List, ListItem, Icon, Card } from 'react-native-elements'
 import realm from '../../models/schemas'
 
 class PlaceHome extends Component {
@@ -55,17 +55,24 @@ class PlaceHome extends Component {
 		const { navigation } = this.props;
 		return (
 			<View style={styles.container}>
-				<View style={styles.title}>
-					<View style={styles.viewTitle}>
-						<Text style={styles.searchText}>Digite aqui a fazenda ou proprietário:</Text>
-					</View>
-					<TextInput
-				        style={{ height: 40, borderWidth: 1, marginLeft: 5, marginRight: 5, alignItems: 'stretch'}}
-				        onChangeText={(text) => this.filterList(text)}
-				        value={this.state.text}
-				    />
-				</View>
-				<List containerStyle={{marginBottom: 20}}>
+				<List containerStyle={{marginBottom: 20, marginTop: 0}}>
+					<ListItem
+						title="Pesquisar"
+						subtitle={
+				          	<View>
+				            	<TextInput
+							        style={{ height: 40, marginLeft: 5, marginRight: 5, alignItems: 'stretch', color: '#fff'}}
+							        onChangeText={(text) => this.filterList(text)}
+							        value={this.state.text}
+							        placeholder="Cliente ou Fazenda"
+							        placeholderTextColor="#fff"
+							    />
+				          	</View>
+				        }
+				        style={{ backgroundColor: '#088A08' }}
+				        titleStyle={{ color: '#fff', fontSize: 16}}
+				        hideChevron={true}
+					/>
 					<FlatList
 					  	data={this.state.newlist}
 					  	renderItem={({item}) => this.renderRow(item) }
@@ -83,17 +90,12 @@ const styles = StyleSheet.create({
 	},
 	viewTitle: {
 		alignItems: 'center',
-		margin: 5
 	},
 	title: {
 		justifyContent: 'center',
 		alignItems: 'stretch'
 	},
-	searchText: {
-		marginTop: 20
-	},
 	textTitle: {
-		marginTop: 15,
 		fontSize: 18
 	}
 })

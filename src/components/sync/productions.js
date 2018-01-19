@@ -6,7 +6,7 @@ export default saveProductions =  (items) => {
         items.map( item => {
             let production = realm.objects('Production').filtered(`id = ${item.id}`)[0]
             if (production) {
-                realm.delete(all)
+                realm.delete(production)
             }
             production = realm.create('Production', {
                 id: item.id,

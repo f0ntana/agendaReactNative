@@ -4,11 +4,12 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import io.realm.react.RealmReactPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.horcrux.svg.SvgPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.horcrux.svg.SvgPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new RealmReactPackage(),
+            new VectorIconsPackage(),
             new SvgPackage()
       );
     }
