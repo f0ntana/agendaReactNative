@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator} from 'react-native'
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator, DeviceEventEmitter} from 'react-native'
 import { Card, Badge, Button, List, ListItem } from 'react-native-elements'
 import moment from 'moment'
 import t from 'tcomb-form-native'
@@ -12,24 +12,71 @@ import Modal from 'react-native-modal'
 
 import ListProductions from './agenda_list_productions'
 
+import { RNLocation as Location } from 'NativeModules';
+
 export default class AgendaDetail extends Component {
 	constructor(props) {
         super(props)
         let place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
         let schedule = realm.objects('Schedule').filtered(`id = ${this.props.navigation.state.params.id}`)[0]
+        this.listener = undefined;
         this.state = {
             schedule: schedule,
             place: place,
             productions: {},
             isModalVisible: false,
             resume: '',
-            isLoading: false
+            isLoading: false,
+            location: {}
         }
     }
 
     componentWillMount () {
         let productions = realm.objects('Production').filtered('place_id = ' + this.state.place.id).sorted('crop_id', 'DESC')
         this.setState({ productions: productions })
+
+        Location.startUpdatingLocation();
+        this.listener = (location) => {
+            this.setState({ location })
+        };
+        DeviceEventEmitter.addListener('locationUpdated', this.listener);
+    }
+
+    componentWillUnmount() {
+        Location.stopUpdatingLocation();
+        DeviceEventEmitter.removeListener('locationUpdated', this.listener);
+        this.listener = null;
+    }
+
+    getPosition() {
+        this.setState({ isLoading : true })
+        if(!this.state.location.latitude || !this.state.location.longitude) {
+            this.setState({ isLoading : false })
+            return alert('Ainda não temos uma posição tente novamente');
+        }
+        realm.write(() => {
+            let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
+            if (schedule.finished) {
+                this.setState({ isLoading : false })
+                return alert('Visita já finalizada')
+            }
+            if (schedule.start_travel) {
+                schedule.endLat = String(this.state.location.latitude)
+                schedule.endLong = String(this.state.location.longitude)
+                schedule.endTravelDate = moment().subtract(3, 'hours').toDate()
+                schedule.finished = true
+                this.props.navigation.state.params.changeFinished(schedule)
+                this.setState({ isLoading : false })
+                return this._showModal()
+            }
+            schedule.startLat = String(this.state.location.latitude)
+            schedule.startLong = String(this.state.location.longitude)
+            schedule.startTravelDate = moment().subtract(3, 'hours').toDate()
+            schedule.start_travel = true
+            this.props.navigation.state.params.changeColor(schedule)
+            this.setState({ isLoading : false })
+            return alert('Visita iniciada')
+        })
     }
 
     _showModal() {
@@ -47,51 +94,6 @@ export default class AgendaDetail extends Component {
         })
 
         this.setState({ isModalVisible: false })
-    }
-
-    getPosition() {
-        this.setState({ isLoading : true })
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                this.setState({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    error: null,
-                })
-
-                realm.write(() => {
-                    let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
-                    if (schedule.finished) {
-                        return alert('Visita já finalizada')
-                    }
-                    if (schedule.start_travel) {
-                        schedule.endLat = String(this.state.latitude)
-                        schedule.endLong = String(this.state.longitude)
-                        schedule.endTravelDate = moment().subtract(3, 'hours').toDate()
-                        schedule.finished = true
-                        this.setState({ finished: true })
-                        this.props.navigation.state.params.changeFinished(schedule)
-                        return this._showModal()
-                    }
-                    schedule.startLat = String(this.state.latitude)
-                    schedule.startLong = String(this.state.longitude)
-                    schedule.startTravelDate = moment().subtract(3, 'hours').toDate()
-                    schedule.start_travel = true
-                    this.props.navigation.state.params.changeColor(schedule)
-                    this.setState({ start_travel: true  })
-                    return alert('Visita iniciada')
-                })
-                this.setState({ isLoading : false })
-            },
-            (error) => {
-                alert('Falha ao sincronizar GPS ou GPS desligado, tente novamente!')
-                this.setState({ error: error.message })
-                this.setState({ isLoading : false })
-            },
-            {
-                enableHighAccuracy: false,
-            },
-        )
     }
 
     renderProductionDetail (item) {

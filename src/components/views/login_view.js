@@ -58,12 +58,18 @@ export default class LoginHome extends Component {
 					style={styles.backgroundImage}
 					>
 					<Card containerStyle={{marginTop: 20, opacity: 0.8}}>
-
 						<Image
 							source={ IMAGEPETROVINA }
 							style={{ width: SCREEN_WIDTH * 0.80 }}
 							resizeMode="contain"
 						/>
+						{this.state.isLoading &&
+							<ActivityIndicator
+				               color = '#338927'
+				               size = "large"
+				               style = {styles.activityIndicator}
+				            />
+				        }
 						<FormLabel labelStyle={styles.textForm}>Email</FormLabel>
 						<FormInput
 							inputStyle={styles.textForm}
@@ -85,13 +91,7 @@ export default class LoginHome extends Component {
 							title='Entrar'
 							onPress={() => this.doLogin()}
 						/>
-						{this.state.isLoading &&
-							<ActivityIndicator
-				               color = '#338927'
-				               size = "large"
-				               style = {styles.activityIndicator}
-				            />
-				        }
+						<Text style={styles.version}>Versão: 6</Text>
 					</Card>
 
 				</Image>
@@ -111,6 +111,11 @@ let styles = StyleSheet.create({
 	textForm: {
 		fontSize: 16
 	},
+	version: {
+		textAlign: 'right',
+    	fontWeight: 'bold',
+    	fontSize: 14,
+	},
 	loading: {
 	    position: 'absolute',
 	    left: 0,
@@ -118,6 +123,7 @@ let styles = StyleSheet.create({
 	    top: 0,
 	    bottom: 0,
 	    alignItems: 'center',
-	    justifyContent: 'center'
+	    justifyContent: 'center',
+	    margin: 10
   	}
 });

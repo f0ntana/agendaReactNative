@@ -26,24 +26,6 @@ class AgendaHome extends Component {
 		};
 	}
 
-	refreshComponent() {
-		this.setState({
-			items: {}
-		}, () => {
-			this._fetchData()
-		})
-	}
-
-	_fetchData = () => {
-		API.getSchedulesUser()
-		.then(response => response.json())
-		.then(response => {
-			this.setState({
-				items: response
-			});
-		})
-	};
-
 	render() {
 		const { navigation } = this.props;
 		return (
@@ -70,36 +52,40 @@ class AgendaHome extends Component {
 		if (scheduleItems.length == 0 || !grouped[now] ) {
 			grouped[now] = []
 		}
+
 		this.setState({
 			items: grouped
 		})
 	}
 
 	changeColor(agenda){
-		let oldItems = this.state.items;
-		this.setState({ items : {} })
-		let items = oldItems[moment(agenda.date).format('YYYY-MM-DD')].map(item => {
-			if(item.id == agenda.id){
-				item.start_travel = true;
-			}
-			return item
-		})
-		oldItems[moment(agenda.date).format('YYYY-MM-DD')] = items
-		this.setState({ items : oldItems })
-	}
+        let { items } = this.state;
+        let newItems = { ...items };
+        let key = moment(agenda.date).format('YYYY-MM-DD');
+        let itemsByDate = newItems[key];
+        newItems[key] = itemsByDate.map( item => {
+            if(item.id == agenda.id){
+                item.start_travel = true
+            }
+            return item;
+        })
+        this.setState({ items : newItems })
+    }
+
 
 	changeFinished(agenda){
-		let oldItems = this.state.items;
-		this.setState({ items : {} })
-		let items = oldItems[moment(agenda.date).format('YYYY-MM-DD')].map(item => {
-			if(item.id == agenda.id){
-				item.finished = true;
-			}
-			return item
-		})
-		oldItems[moment(agenda.date).format('YYYY-MM-DD')] = items
-		this.setState({ items : oldItems })
-	}
+        let { items } = this.state;
+        let newItems = { ...items };
+        let key = moment(agenda.date).format('YYYY-MM-DD');
+        let itemsByDate = newItems[key];
+        newItems[key] = itemsByDate.map( item => {
+            if(item.id == agenda.id){
+                item.finished = true
+            }
+            return item;
+        })
+        this.setState({ items : newItems })
+    }
 
 	renderAgendaDetail(item) {
 		const { navigate } = this.props.navigation
@@ -128,6 +114,12 @@ class AgendaHome extends Component {
 							</Text>
 							<Text style={styles.itemTextDescription}>
 								{item.description}
+							</Text>
+							<Text style={styles.itemTextDescription}>
+								Start: {item.start_travel ? 'Sim' : 'Não'}
+							</Text>
+							<Text style={styles.itemTextDescription}>
+								Finished: {item.finished ? 'Sim' : 'Não'}
 							</Text>
 						</View>
 						{item.start_travel && !item.finished &&
