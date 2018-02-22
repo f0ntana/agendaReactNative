@@ -31,13 +31,13 @@ export default class LoginHome extends Component {
 	}
 
 	doLogin() {
-		this.setState({isLoading: true})
+		this.setState({ isLoading: true })
 		API.postLogin(this.state)
 		.then(response => response.json())
-		.then(response => {
+		.then(async response => {
 			if(response.data){
 				try {
-					AsyncStorage.setItem('_token', response.data.token);
+					await AsyncStorage.setItem('_token', response.data.token);
 				} catch (error) {
 					alert('erro ao salvar token')
 				}
@@ -91,7 +91,7 @@ export default class LoginHome extends Component {
 							title='Entrar'
 							onPress={() => this.doLogin()}
 						/>
-						<Text style={styles.version}>Versão: 6</Text>
+						<Text style={styles.version}>Versão: 7</Text>
 					</Card>
 
 				</Image>

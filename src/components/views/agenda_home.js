@@ -27,6 +27,7 @@ class AgendaHome extends Component {
 	}
 
 	render() {
+		console.log(this.state.items)
 		const { navigation } = this.props;
 		return (
 			<Agenda
@@ -41,6 +42,7 @@ class AgendaHome extends Component {
 	}
 
 	loadItems(day) {
+		console.log('loadItems')
 		let now = moment(NOW).format('YYYY-MM-DD')
 		let scheduleItems = realm.objects('Schedule')
 
@@ -58,39 +60,13 @@ class AgendaHome extends Component {
 		})
 	}
 
-	changeColor(agenda){
-        let { items } = this.state;
-        let newItems = { ...items };
-        let key = moment(agenda.date).format('YYYY-MM-DD');
-        let itemsByDate = newItems[key];
-        newItems[key] = itemsByDate.map( item => {
-            if(item.id == agenda.id){
-                item.start_travel = true
-            }
-            return item;
-        })
-        this.setState({ items : newItems })
-    }
-
-
-	changeFinished(agenda){
-        let { items } = this.state;
-        let newItems = { ...items };
-        let key = moment(agenda.date).format('YYYY-MM-DD');
-        let itemsByDate = newItems[key];
-        newItems[key] = itemsByDate.map( item => {
-            if(item.id == agenda.id){
-                item.finished = true
-            }
-            return item;
-        })
-        this.setState({ items : newItems })
+	triggerChange(agenda){
+        this.loadItems()
     }
 
 	renderAgendaDetail(item) {
 		const { navigate } = this.props.navigation
-		item.changeColor = this.changeColor.bind(this)
-		item.changeFinished = this.changeFinished.bind(this)
+		item.triggerChange = this.triggerChange.bind(this)
 		navigate('Agenda_Detail', item);
 	}
 
@@ -157,7 +133,8 @@ class AgendaHome extends Component {
 	}
 
 	rowHasChanged(r1, r2) {
-		return r1.name !== r2.name;
+		console.log('rowHasChanged')
+	   	return  r1 !== r2;
 	}
 
 }

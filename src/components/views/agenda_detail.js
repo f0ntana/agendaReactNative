@@ -65,7 +65,7 @@ export default class AgendaDetail extends Component {
                 schedule.endLong = String(this.state.location.longitude)
                 schedule.endTravelDate = moment().subtract(3, 'hours').toDate()
                 schedule.finished = true
-                this.props.navigation.state.params.changeFinished(schedule)
+                this.props.navigation.state.params.triggerChange(schedule)
                 this.setState({ isLoading : false })
                 return this._showModal()
             }
@@ -73,7 +73,7 @@ export default class AgendaDetail extends Component {
             schedule.startLong = String(this.state.location.longitude)
             schedule.startTravelDate = moment().subtract(3, 'hours').toDate()
             schedule.start_travel = true
-            this.props.navigation.state.params.changeColor(schedule)
+            this.props.navigation.state.params.triggerChange(schedule)
             this.setState({ isLoading : false })
             return alert('Visita iniciada')
         })
