@@ -11,6 +11,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height
 
 const IMAGELOGORENDER = require('./../../images/soja.png')
 const IMAGEPETROVINA = require('./../../images/petrovina.png')
+import SharedPreferences from 'react-native-shared-preferences';
 
 export default class LoginHome extends Component {
 	constructor(props) {
@@ -31,6 +32,8 @@ export default class LoginHome extends Component {
 	}
 
 	doLogin() {
+		console.error(SharedPreferences.getItem('LAST_KNOWN_POSITION'));
+		return;
 		this.setState({ isLoading: true })
 		API.postLogin(this.state)
 		.then(response => response.json())

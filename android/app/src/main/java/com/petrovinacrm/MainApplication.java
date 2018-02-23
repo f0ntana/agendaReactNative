@@ -3,7 +3,6 @@ package com.petrovinacrm;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import in.sriraman.sharedpreferences.RNSharedPreferencesReactPackage;
 import io.realm.react.RealmReactPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
@@ -27,10 +26,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNSharedPreferencesReactPackage(),
             new RealmReactPackage(),
             new VectorIconsPackage(),
-            new SvgPackage()
+            new SvgPackage(),
+            new LocationPackage()
       );
     }
   };
