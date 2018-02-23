@@ -22,12 +22,12 @@ import com.petrovinacrm.WakefulIntentService;
 
 public class LocationService extends WakefulIntentService {
   
+  public static String lastPosition = "";
   private final long DELAY_TIME = (long) 30 * 1000;
 
   public LocationService() {
     super("LocationService");
   }
-  
 
   @Override
   protected void doWakefulWork(Intent intent) {
@@ -46,15 +46,10 @@ public class LocationService extends WakefulIntentService {
   }
 
   static class Listener implements LocationListener {
-    private SharedPreferences preferences;
-    public Listener(Context context) {
-      preferences = context.getSharedPreferences("bg-service", MODE_PRIVATE);
-    }
-
     @Override
     public void onLocationChanged(Location loc) {
         String positionStr = loc.getLatitude() + "|" + loc.getLongitude();
-        preferences.edit().putString("LAST_KNOWN_POSITION", positionStr).commit();
+        lastPosition = positionStr;
         Log.d("FONTANA", positionStr);
     }
 

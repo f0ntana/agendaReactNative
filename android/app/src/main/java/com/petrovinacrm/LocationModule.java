@@ -20,7 +20,6 @@ public class LocationModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public String get() {
-        SharedPreferences servicePreferences = getReactApplicationContext().getSharedPreferences("bg-service", Context.MODE_PRIVATE);
-        return servicePreferences.getString("LAST_KNOWN_POSITION", "");
+        return LocationService.lastPosition;
     }
 }
