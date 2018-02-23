@@ -38,7 +38,7 @@ public class LocationService extends WakefulIntentService {
     }
 
     LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-    LocationListener locationListener = new LocationService.Listener(getApplicationContext());
+    LocationListener locationListener = new LocationService.Listener();
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
 
     SystemClock.sleep(DELAY_TIME);
@@ -49,7 +49,7 @@ public class LocationService extends WakefulIntentService {
     @Override
     public void onLocationChanged(Location loc) {
         String positionStr = loc.getLatitude() + "|" + loc.getLongitude();
-        lastPosition = positionStr;
+        LocationService.lastPosition = positionStr;
         Log.d("FONTANA", positionStr);
     }
 

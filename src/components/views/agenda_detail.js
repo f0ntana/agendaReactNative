@@ -34,10 +34,16 @@ export default class AgendaDetail extends Component {
         this.setState({ productions: productions })
     }
 
-    getPosition() {
+    async getPosition() {
         this.setState({ isLoading: true })
 
-        const location = NativeModules.FontanaLocation.get();
+        let location = undefined;
+        try {
+            location = await NativeModules.FontanaLocation.getPosition();
+        } catch (e) {
+            console.log(e)
+        }
+
         if (!location) {
             this.setState({ isLoading: false })
             return alert('Ainda não temos uma posição tente novamente');
