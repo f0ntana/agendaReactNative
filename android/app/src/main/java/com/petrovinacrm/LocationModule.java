@@ -3,6 +3,7 @@ package com.petrovinacrm;
 import android.content.SharedPreferences;
 import com.facebook.react.bridge.*;
 import java.lang.String;
+import android.content.Context;
 
 public class LocationModule extends ReactContextBaseJavaModule {
 
