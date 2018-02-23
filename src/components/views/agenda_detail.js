@@ -11,8 +11,7 @@ import { Icon } from 'react-native-elements'
 import Modal from 'react-native-modal'
 
 import ListProductions from './agenda_list_productions'
-
-import { RNLocation as Location } from 'NativeModules';
+import SharedPreferences from 'react-native-shared-preferences';
 
 export default class AgendaDetail extends Component {
 	constructor(props) {
@@ -34,26 +33,21 @@ export default class AgendaDetail extends Component {
     componentWillMount () {
         let productions = realm.objects('Production').filtered('place_id = ' + this.state.place.id).sorted('crop_id', 'DESC')
         this.setState({ productions: productions })
-
-        Location.startUpdatingLocation();
-        this.listener = (location) => {
-            this.setState({ location })
-        };
-        DeviceEventEmitter.addListener('locationUpdated', this.listener);
-    }
-
-    componentWillUnmount() {
-        Location.stopUpdatingLocation();
-        DeviceEventEmitter.removeListener('locationUpdated', this.listener);
-        this.listener = null;
     }
 
     getPosition() {
         this.setState({ isLoading : true })
-        if(!this.state.location.latitude || !this.state.location.longitude) {
+
+        const location = SharedPreferences.getItem('LAST_KNOWN_POSITION')
+        if (!location) {
             this.setState({ isLoading : false })
             return alert('Ainda não temos uma posição tente novamente');
         }
+
+        const locationPair = location.split('|');
+        const latitude = locationPair[0];
+        const longitude = locationPair[1];
+
         realm.write(() => {
             let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
             if (schedule.finished) {
@@ -61,16 +55,16 @@ export default class AgendaDetail extends Component {
                 return alert('Visita já finalizada')
             }
             if (schedule.start_travel) {
-                schedule.endLat = String(this.state.location.latitude)
-                schedule.endLong = String(this.state.location.longitude)
+                schedule.endLat = latitude
+                schedule.endLong = longitude
                 schedule.endTravelDate = moment().subtract(3, 'hours').toDate()
                 schedule.finished = true
                 this.props.navigation.state.params.triggerChange(schedule)
                 this.setState({ isLoading : false })
                 return this._showModal()
             }
-            schedule.startLat = String(this.state.location.latitude)
-            schedule.startLong = String(this.state.location.longitude)
+            schedule.startLat = latitude
+            schedule.startLong = longitude
             schedule.startTravelDate = moment().subtract(3, 'hours').toDate()
             schedule.start_travel = true
             this.props.navigation.state.params.triggerChange(schedule)
