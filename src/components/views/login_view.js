@@ -11,14 +11,13 @@ const SCREEN_HEIGHT = Dimensions.get('window').height
 
 const IMAGELOGORENDER = require('./../../images/soja.png')
 const IMAGEPETROVINA = require('./../../images/petrovina.png')
-import SharedPreferences from 'react-native-shared-preferences';
 
 export default class LoginHome extends Component {
 	constructor(props) {
 		super(props)
 
-		let token = AsyncStorage.getItem('_token').then( value => {
-			if(value){
+		let token = AsyncStorage.getItem('_token').then(value => {
+			if (value) {
 				const { navigate } = this.props.navigation;
 				navigate('Agenda');
 			}
@@ -32,53 +31,52 @@ export default class LoginHome extends Component {
 	}
 
 	doLogin() {
-		console.error(SharedPreferences.getItem('LAST_KNOWN_POSITION'));
 		return;
 		this.setState({ isLoading: true })
 		API.postLogin(this.state)
-		.then(response => response.json())
-		.then(async response => {
-			if(response.data){
-				try {
-					await AsyncStorage.setItem('_token', response.data.token);
-				} catch (error) {
-					alert('erro ao salvar token')
+			.then(response => response.json())
+			.then(async response => {
+				if (response.data) {
+					try {
+						await AsyncStorage.setItem('_token', response.data.token);
+					} catch (error) {
+						alert('erro ao salvar token')
+					}
+					const { navigate } = this.props.navigation;
+					navigate('Agenda');
+				} else {
+					alert('Dados inválidos')
+					this.setState({ isLoading: false })
 				}
-				const { navigate } = this.props.navigation;
-				navigate('Agenda');
-			} else {
-				alert('Dados inválidos')
-				this.setState({isLoading: false})
-			}
-		})
+			})
 	}
 
 	render() {
 		return (
 			<KeyboardAwareScrollView ref='scroll'>
 				<Image
-					source={ IMAGELOGORENDER }
+					source={IMAGELOGORENDER}
 					style={styles.backgroundImage}
-					>
-					<Card containerStyle={{marginTop: 20, opacity: 0.8}}>
+				>
+					<Card containerStyle={{ marginTop: 20, opacity: 0.8 }}>
 						<Image
-							source={ IMAGEPETROVINA }
+							source={IMAGEPETROVINA}
 							style={{ width: SCREEN_WIDTH * 0.80 }}
 							resizeMode="contain"
 						/>
 						{this.state.isLoading &&
 							<ActivityIndicator
-				               color = '#338927'
-				               size = "large"
-				               style = {styles.activityIndicator}
-				            />
-				        }
+								color='#338927'
+								size="large"
+								style={styles.activityIndicator}
+							/>
+						}
 						<FormLabel labelStyle={styles.textForm}>Email</FormLabel>
 						<FormInput
 							inputStyle={styles.textForm}
 							ref='forminput'
 							textInputRef='email'
-							onChangeText={(val) => { this.setState( {'email': val} )}}
+							onChangeText={(val) => { this.setState({ 'email': val }) }}
 						/>
 						<FormLabel labelStyle={styles.textForm}>Senha</FormLabel>
 						<FormInput
@@ -86,11 +84,11 @@ export default class LoginHome extends Component {
 							ref='forminput'
 							textInputRef='password'
 							secureTextEntry={true}
-							onChangeText={(val) => { this.setState( {'password': val} )}}
+							onChangeText={(val) => { this.setState({ 'password': val }) }}
 						/>
 						<Button
-							icon={{name: 'user', type: 'font-awesome'}}
-							style={{ marginTop: 20}}
+							icon={{ name: 'user', type: 'font-awesome' }}
+							style={{ marginTop: 20 }}
 							title='Entrar'
 							onPress={() => this.doLogin()}
 						/>
@@ -116,17 +114,17 @@ let styles = StyleSheet.create({
 	},
 	version: {
 		textAlign: 'right',
-    	fontWeight: 'bold',
-    	fontSize: 14,
+		fontWeight: 'bold',
+		fontSize: 14,
 	},
 	loading: {
-	    position: 'absolute',
-	    left: 0,
-	    right: 0,
-	    top: 0,
-	    bottom: 0,
-	    alignItems: 'center',
-	    justifyContent: 'center',
-	    margin: 10
-  	}
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		alignItems: 'center',
+		justifyContent: 'center',
+		margin: 10
+	}
 });

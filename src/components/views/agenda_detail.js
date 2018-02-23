@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { NativeModule, View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator, DeviceEventEmitter } from 'react-native'
+import { NativeModules, View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator, DeviceEventEmitter } from 'react-native'
 import { Card, Badge, Button, List, ListItem } from 'react-native-elements'
 import moment from 'moment'
 import t from 'tcomb-form-native'
@@ -37,7 +37,7 @@ export default class AgendaDetail extends Component {
     getPosition() {
         this.setState({ isLoading: true })
 
-        const location = NativeModule.FontanaLocation.get();
+        const location = NativeModules.FontanaLocation.get();
         if (!location) {
             this.setState({ isLoading: false })
             return alert('Ainda não temos uma posição tente novamente');
