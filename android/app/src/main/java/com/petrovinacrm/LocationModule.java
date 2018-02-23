@@ -16,7 +16,7 @@ import android.util.Log;
 
 public class LocationModule extends ReactContextBaseJavaModule {
 
-    final long DELAY_TIME = (long) 30 * 1000;
+    final long DELAY_TIME = (long) 10 * 1000;
     Promise promise;
 
     public LocationModule(ReactApplicationContext reactContext) {
@@ -28,44 +28,31 @@ public class LocationModule extends ReactContextBaseJavaModule {
         return "FontanaLocation";
     }
 
+    boolean isRunning = false;
     @ReactMethod
     public void getPosition(final Promise promise) {
+        Log.d("FONTANA", "getPosition");
         this.promise = promise;
-        try {
-            LocationManager locationManager = (LocationManager) getReactApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-            LocationModule.Listener locationListener = new LocationModule.Listener();
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-
-            SystemClock.sleep(DELAY_TIME);
-            List<String> positions = locationListener.getPositions();
-            locationManager.removeUpdates(locationListener);
-
-            Log.d("FONTANA", "POSITIONS:"+positions.size());
-            if (positions.size() == 0) {
-                promise.reject("NOT_READY_YET", "NOT_READY_YET");
-                return;
-            }
-
-            promise.resolve(positions.get(0));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            promise.reject("GENERIC_ERROR", "GENERIC_ERROR");
+        if (LocationService.lastPosition == null || LocationService.lastPosition.isEmpty()) {
+            promise.reject("NOT_READY_YET", "NOT_READY_YET");
+            return;
         }
+
+        promise.resolve(LocationService.lastPosition);
     }
 
   static class Listener implements LocationListener {
 
-    List<String> positions = new LinkedList<>();
-
-    public List<String> getPositions() {
-        return this.positions;
+    List<String> positions;
+    Listener(List<String> positions) {
+        this.positions = positions;
     }
 
     @Override
     public void onLocationChanged(Location loc) {
         String positionStr = loc.getLatitude() + "|" + loc.getLongitude();
-        this.getPositions().add(positionStr);
-        Log.d("FONTANA", positionStr);
+        positions.add(positionStr);
+        Log.d("onLocationChanged", positionStr);
     }
 
     @Override

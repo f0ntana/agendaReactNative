@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, Dimensions, Image, AsyncStorage, Text, ActivityIndicator } from 'react-native'
+import { NativeModules, View, StyleSheet, Dimensions, Image, AsyncStorage, Text, ActivityIndicator } from 'react-native'
 import { FormLabel, FormInput, FormValidationMessage, Button, Card } from 'react-native-elements'
 import { Icon } from 'react-native-elements'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -31,7 +31,6 @@ export default class LoginHome extends Component {
 	}
 
 	doLogin() {
-		return;
 		this.setState({ isLoading: true })
 		API.postLogin(this.state)
 			.then(response => response.json())

@@ -23,7 +23,7 @@ import com.petrovinacrm.WakefulIntentService;
 public class LocationService extends WakefulIntentService {
   
   public static String lastPosition = "";
-  private final long DELAY_TIME = (long) 30 * 1000;
+  private final long DELAY_TIME = (long) 10 * 1000;
 
   public LocationService() {
     super("LocationService");

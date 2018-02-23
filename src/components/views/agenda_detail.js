@@ -41,12 +41,8 @@ export default class AgendaDetail extends Component {
         try {
             location = await NativeModules.FontanaLocation.getPosition();
         } catch (e) {
-            console.log(e)
-        }
-
-        if (!location) {
             this.setState({ isLoading: false })
-            return alert('Ainda não temos uma posição tente novamente');
+            return alert('Ainda não temos uma posição tente novamente. Aguarde alguns instances!');
         }
 
         const locationPair = location.split('|');
