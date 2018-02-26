@@ -97,8 +97,8 @@ android {
         applicationId "com.petrovinacrm"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 9
-        versionName "9"
+        versionCode 10
+        versionName "10"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
