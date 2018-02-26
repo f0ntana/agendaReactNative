@@ -54,8 +54,8 @@ export default class AgendaDetail extends Component {
             return alert('Ainda não temos uma posição tente novamente. Aguarde alguns instances!');
         }
 
-        const latitude = this.state.location.latitude;
-        const longitude = this.state.location.longitude;
+        const latitude = (this.state.location.latitude).toString();
+        const longitude = (this.state.location.longitude).toString();
 
         realm.write(() => {
             let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
