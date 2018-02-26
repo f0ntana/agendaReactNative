@@ -30,24 +30,32 @@ export default class AgendaDetail extends Component {
     }
 
     componentWillMount() {
+        this.listener = (location) => {
+            this.setState({ location })
+        };
+
+        NativeModules.FontanaLocation.startListener();
+        DeviceEventEmitter.addListener("fontanaLocation", this.listener);
+
         let productions = realm.objects('Production').filtered('place_id = ' + this.state.place.id).sorted('crop_id', 'DESC')
         this.setState({ productions: productions })
+    }
+
+    componentWillUnmount() {
+        DeviceEventEmitter.removeListener("fontanaLocation", this.listener);
+        NativeModules.FontanaLocation.stopListener();
     }
 
     async getPosition() {
         this.setState({ isLoading: true })
 
-        let location = undefined;
-        try {
-            location = await NativeModules.FontanaLocation.getPosition();
-        } catch (e) {
+        if (!this.state.location) {
             this.setState({ isLoading: false })
             return alert('Ainda não temos uma posição tente novamente. Aguarde alguns instances!');
         }
 
-        const locationPair = location.split('|');
-        const latitude = locationPair[0];
-        const longitude = locationPair[1];
+        const latitude = this.state.location.latitude;
+        const longitude = this.state.location.longitude;
 
         realm.write(() => {
             let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
