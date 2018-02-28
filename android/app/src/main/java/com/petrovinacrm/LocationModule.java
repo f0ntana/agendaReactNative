@@ -85,6 +85,9 @@ public class LocationModule extends ReactContextBaseJavaModule {
     }
 
     public void onLocationChanged(Location location) {
+        if (location == null) {
+            return;
+        }
         Log.d("FONTANA", location.toString());
         WritableMap params = Arguments.createMap();
 
