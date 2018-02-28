@@ -46,10 +46,13 @@ export default class AgendaDetail extends Component {
         NativeModules.FontanaLocation.stopListener();
     }
 
-    async getPosition() {
+    getPosition() {
         this.setState({ isLoading: true })
 
-        if (!this.state.location) {
+        const location = this.state.location;
+        const isEmpty = !location || !Object.keys(location).length;
+
+        if (isEmpty) {
             this.setState({ isLoading: false })
             return alert('Ainda não temos uma posição tente novamente. Aguarde alguns instances!');
         }
