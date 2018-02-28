@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { NativeModules, View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator, DeviceEventEmitter } from 'react-native'
+import { PermissionsAndroid, NativeModules, View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator, DeviceEventEmitter } from 'react-native'
 import { Card, Badge, Button, List, ListItem } from 'react-native-elements'
 import moment from 'moment'
 import t from 'tcomb-form-native'
@@ -29,7 +29,34 @@ export default class AgendaDetail extends Component {
         }
     }
 
-    componentWillMount() {
+    async componentWillMount() {
+
+        let permissionCoarse = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION);
+        let permissionFine = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+
+        console.log({ permissionCoarse, permissionFine })
+
+        if (!permissionCoarse || !permissionFine) {
+            try {
+                while (!permissionCoarse || !permissionFine) {
+                    if (!permissionCoarse) {
+                        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION);
+                        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                            permissionCoarse = true;
+                        }
+                    }
+
+                    if (!permissionFine) {
+                        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+                        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                            permissionFine = true;
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
         this.listener = (location) => {
             this.setState({ location })
         };
