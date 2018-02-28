@@ -1,7 +1,23 @@
 package com.petrovinacrm;
 
-import com.facebook.react.bridge.*;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Looper;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.modules.core.PermissionListener;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -9,18 +25,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 
-import java.lang.String;
-
-import android.location.Location;
-import android.os.Looper;
-import android.util.Log;
-
 import javax.annotation.Nullable;
 
-public class LocationModule extends ReactContextBaseJavaModule {
+public class LocationModule extends ReactContextBaseJavaModule implements PermissionListener {
 
+    private LocationManager locationManager;
     private LocationRequest mLocationRequest;
     private LocationCallback mLocationCallback;
+    private AlertDialog gpsDisabledDialog;
     private boolean hasListener = false;
 
     private final long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
@@ -75,7 +87,7 @@ public class LocationModule extends ReactContextBaseJavaModule {
         }
     }
 
-    protected void stopLocationUpdates() throws LocationNotRunningException{
+    protected void stopLocationUpdates() throws LocationNotRunningException {
         if (mLocationCallback == null) {
             throw new LocationNotRunningException();
         }
@@ -108,6 +120,12 @@ public class LocationModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void startListener() {
+        Log.d("FONTANA", "GPS Enabled: " + isGpsEnabled());
+        if (!isGpsEnabled()) {
+            showDialogWhenGpsIsDisabled();
+            return;
+        }
+
         try {
             startLocationUpdates();
         } catch (LocationAlreadyStartedException e) {
@@ -115,16 +133,59 @@ public class LocationModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @Override
+    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        return grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+    }
+
     @ReactMethod
     public void stopListener() {
         try {
             stopLocationUpdates();
-        } catch (LocationNotRunningException e ) {
+        } catch (LocationNotRunningException e) {
             e.printStackTrace();
         }
     }
 
-    static class LocationAlreadyStartedException extends Exception {}
-    static class LocationNotRunningException extends Exception {}
+    private boolean isGpsEnabled() {
+        if (locationManager == null) {
+            locationManager = (LocationManager) getReactApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
+
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    private void showDialogWhenGpsIsDisabled() {
+        if (gpsDisabledDialog == null) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getCurrentActivity());
+            alertDialogBuilder.setMessage("Seu GPS está desativado. Deseja ativar agora?")
+                    .setCancelable(false)
+                    .setPositiveButton("Ativar",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent callGPSSettingIntent = new Intent(
+                                            android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    getCurrentActivity().startActivity(callGPSSettingIntent);
+                                }
+                            });
+            alertDialogBuilder.setNegativeButton("Cancelar",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            gpsDisabledDialog = alertDialogBuilder.create();
+        }
+
+        if (!gpsDisabledDialog.isShowing()) {
+            gpsDisabledDialog.show();
+        }
+    }
+
+    static class LocationAlreadyStartedException extends Exception {
+    }
+
+    static class LocationNotRunningException extends Exception {
+    }
 
 }
