@@ -49,8 +49,8 @@ export default class AgendaDetail extends Component {
     getPosition() {
         this.setState({ isLoading: true })
 
-        const location = this.state.location;
-        const isEmpty = !location || !Object.keys(location).length;
+        const location = this.state.location
+        const isEmpty = !location || !Object.keys(location).length
 
         if (isEmpty) {
             this.setState({ isLoading: false })
