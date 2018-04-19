@@ -74,7 +74,7 @@ let formOptions = {
         crop_id: { label: 'Safra' },
         cultivar_id: { label: 'Cultivar' },
         seed_brand_id: { label: 'Marca Semente' },
-        volume: { label: 'Volume Saco 40Kg' },
+        volume: { label: 'Volume Bags' },
         area: { label: 'Área' },
         productivity: { label: 'Produtividade' },
         population: { label: 'População' },

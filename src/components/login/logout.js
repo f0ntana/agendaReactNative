@@ -3,16 +3,20 @@ import { AsyncStorage, View } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { Icon } from 'react-native-elements'
 
+import realm from "../../models/schemas";
 
 class Logout extends Component {
 
     constructor(props) {
         super(props)
-        let token = AsyncStorage.getItem('_token').then( value => {
-            if(value){
-                AsyncStorage.removeItem('_token')
-                const { navigate } = this.props.navigation
-                navigate('Login');
+        let token = AsyncStorage.getItem('_token').then(value => {
+            if (value) {
+                realm.write(() => {
+                    realm.deleteAll();
+                })
+                AsyncStorage.removeItem("_token");
+                const { navigate } = this.props.navigation;
+                navigate("Login");
             }
         })
     }

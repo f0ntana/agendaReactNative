@@ -86,7 +86,7 @@ export default class AgendaDetail extends Component {
                             <Text style={{ fontWeight: 'bold' }}>Marca Semente: </Text> { realm.objects('SeedBrand').filtered('id = ' + production.seed_brand_id)[0].name }
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Volume: </Text> { production.volume } sc 40KG
+                            <Text style={{ fontWeight: 'bold' }}>Volume: </Text> { production.volume } Bags
                         </Text>
                         <Text style={styles.infosText}>
                             <Text style={{ fontWeight: 'bold' }}>Área: </Text> { production.area }

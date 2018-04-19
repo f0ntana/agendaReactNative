@@ -28,7 +28,7 @@ export default class Graphic extends Component {
 
             Object.keys(summary).forEach((production, index) => {
                 let name = realm.objects('Crop').filtered('id = ' + production)[0].name
-                let sc =  Math.round(summary[production]) + ' sc'
+                let sc =  Math.round(summary[production]) + ' BG'
                 dataGraphic.push({
                     x: ((index+1)),
                     y: summary[production],
@@ -50,7 +50,7 @@ export default class Graphic extends Component {
                     data={this.state.dataGraphic}
                     labelComponent={<VictoryLabel lineHeight="2" style={{ fontSize: 10, height: 40 }} />}
                 />
-                <Text style={{textAlign: 'right', fontStyle : 'italic', fontSize: 12 }}>Volume em Sacas 40KG</Text>
+                <Text style={{textAlign: 'right', fontStyle : 'italic', fontSize: 12 }}>Volume em BAGS</Text>
             </View>
         )
     }

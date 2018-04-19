@@ -34,8 +34,6 @@ export default class AgendaDetail extends Component {
         let permissionCoarse = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION);
         let permissionFine = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
 
-        console.log({ permissionCoarse, permissionFine })
-
         if (!permissionCoarse || !permissionFine) {
             try {
                 while (!permissionCoarse || !permissionFine) {
