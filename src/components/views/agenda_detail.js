@@ -1,148 +1,189 @@
-import React, { Component } from 'react'
-import { PermissionsAndroid, NativeModules, View, ScrollView, StyleSheet, Text, TouchableOpacity, TextInput, ActivityIndicator, DeviceEventEmitter } from 'react-native'
-import { Card, Badge, Button, List, ListItem } from 'react-native-elements'
-import moment from 'moment'
-import t from 'tcomb-form-native'
-import realm from '../../models/schemas'
-import Graphic from './graphic'
-import _ from 'lodash'
-import ActionButton from 'react-native-action-button'
-import { Icon } from 'react-native-elements'
-import Modal from 'react-native-modal'
+import React, { Component } from 'react';
+import {
+    PermissionsAndroid,
+    NativeModules,
+    View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    TextInput,
+    ActivityIndicator,
+    DeviceEventEmitter
+} from 'react-native';
+import { Card, Badge, Button, List, ListItem } from 'react-native-elements';
+import moment from 'moment';
+import t from 'tcomb-form-native';
+import realm from '../../models/schemas';
+import Graphic from './graphic';
+import _ from 'lodash';
+import ActionButton from 'react-native-action-button';
+import { Icon } from 'react-native-elements';
+import Modal from 'react-native-modal';
 
-import ListProductions from './agenda_list_productions'
+import ListProductions from './agenda_list_productions';
 
 export default class AgendaDetail extends Component {
     constructor(props) {
-        super(props)
-        let place = realm.objects('Place').filtered(`id = ${this.props.navigation.state.params.place_id}`)[0]
-        let schedule = realm.objects('Schedule').filtered(`id = ${this.props.navigation.state.params.id}`)[0]
+        super(props);
+
+        let place = realm
+            .objects('Place')
+            .filtered(`id = ${this.props.navigation.state.params.place_id}`)[0];
+
+        let schedule = realm
+            .objects('Schedule')
+            .filtered(`id = ${this.props.navigation.state.params.id}`)[0];
+
+        let productions = realm
+            .objects('Production')
+            .filtered(
+                `place_id = ${this.props.navigation.state.params.place_id}`
+            );
+
         this.listener = undefined;
         this.state = {
             schedule: schedule,
             place: place,
-            productions: {},
+            productions: productions,
             isModalVisible: false,
             resume: '',
             isLoading: false,
             location: {}
-        }
+        };
     }
 
     async componentWillMount() {
-
-        let permissionCoarse = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION);
-        let permissionFine = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+        let permissionCoarse = await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION
+        );
+        let permissionFine = await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
 
         if (!permissionCoarse || !permissionFine) {
             try {
                 while (!permissionCoarse || !permissionFine) {
                     if (!permissionCoarse) {
-                        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION);
+                        const granted = await PermissionsAndroid.request(
+                            PermissionsAndroid.PERMISSIONS
+                                .ACCESS_COARSE_LOCATION
+                        );
                         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                             permissionCoarse = true;
                         }
                     }
 
                     if (!permissionFine) {
-                        const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+                        const granted = await PermissionsAndroid.request(
+                            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+                        );
                         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                             permissionFine = true;
                         }
                     }
                 }
-            } catch (e) {
-            }
+            } catch (e) {}
         }
 
-        this.listener = (location) => {
-            this.setState({ location })
+        this.listener = location => {
+            this.setState({ location });
         };
 
         NativeModules.FontanaLocation.startListener();
-        DeviceEventEmitter.addListener("fontanaLocation", this.listener);
-
-        let productions = realm.objects('Production').filtered('place_id = ' + this.state.place.id).sorted('crop_id', 'DESC')
-        this.setState({ productions: productions })
+        DeviceEventEmitter.addListener('fontanaLocation', this.listener);
     }
 
     componentWillUnmount() {
-        DeviceEventEmitter.removeListener("fontanaLocation", this.listener);
+        DeviceEventEmitter.removeListener('fontanaLocation', this.listener);
         NativeModules.FontanaLocation.stopListener();
     }
 
     getPosition() {
-        this.setState({ isLoading: true })
+        this.setState({ isLoading: true });
 
-        const location = this.state.location
-        const isEmpty = !location || !Object.keys(location).length
+        const location = this.state.location;
+        const isEmpty = !location || !Object.keys(location).length;
 
         if (isEmpty) {
-            this.setState({ isLoading: false })
-            return alert('Ainda não temos uma posição tente novamente. Aguarde alguns instances!');
+            this.setState({ isLoading: false });
+            return alert(
+                'Ainda não temos uma posição tente novamente. Aguarde alguns instances!'
+            );
         }
 
-        const latitude = (this.state.location.latitude).toString();
-        const longitude = (this.state.location.longitude).toString();
+        const latitude = this.state.location.latitude.toString();
+        const longitude = this.state.location.longitude.toString();
 
         realm.write(() => {
-            let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
+            let schedule = realm
+                .objects('Schedule')
+                .filtered(`id = ${this.state.schedule.id}`)[0];
             if (schedule.finished) {
-                this.setState({ isLoading: false })
-                return alert('Visita já finalizada')
+                this.setState({ isLoading: false });
+                return alert('Visita já finalizada');
             }
             if (schedule.start_travel) {
-                schedule.endLat = latitude
-                schedule.endLong = longitude
-                schedule.endTravelDate = moment().subtract(3, 'hours').toDate()
-                schedule.finished = true
-                this.props.navigation.state.params.triggerChange(schedule)
-                this.setState({ isLoading: false })
-                return this._showModal()
+                schedule.endLat = latitude;
+                schedule.endLong = longitude;
+                schedule.endTravelDate = moment()
+                    .subtract(3, 'hours')
+                    .toDate();
+                schedule.finished = true;
+                this.props.navigation.state.params.triggerChange(schedule);
+                this.setState({ isLoading: false });
+                return this._showModal();
             }
-            schedule.startLat = latitude
-            schedule.startLong = longitude
-            schedule.startTravelDate = moment().subtract(3, 'hours').toDate()
-            schedule.start_travel = true
-            this.props.navigation.state.params.triggerChange(schedule)
-            this.setState({ isLoading: false })
-            return alert('Visita iniciada')
-        })
+            schedule.startLat = latitude;
+            schedule.startLong = longitude;
+            schedule.startTravelDate = moment()
+                .subtract(3, 'hours')
+                .toDate();
+            schedule.start_travel = true;
+            this.props.navigation.state.params.triggerChange(schedule);
+            this.setState({ isLoading: false });
+            return alert('Visita iniciada');
+        });
     }
 
     _showModal() {
-        this.setState({ isModalVisible: true })
+        this.setState({ isModalVisible: true });
     }
 
     _hideModal(finished) {
         if (!this.state.resume) {
-            alert('Favor faça um resumo')
-            return
+            alert('Favor faça um resumo');
+            return;
         }
         realm.write(() => {
-            let schedule = realm.objects('Schedule').filtered(`id = ${this.state.schedule.id}`)[0]
-            schedule.resume = this.state.resume
-        })
+            let schedule = realm
+                .objects('Schedule')
+                .filtered(`id = ${this.state.schedule.id}`)[0];
+            schedule.resume = this.state.resume;
+        });
 
-        this.setState({ isModalVisible: false })
+        this.setState({ isModalVisible: false });
     }
 
     renderProductionDetail(item) {
-        const { navigate } = this.props.navigation
-        let data = { ...item }
+        const { navigate } = this.props.navigation;
+        let data = { ...item };
         if (!item) {
-            data = { new: true, place_id: this.props.navigation.state.params.place_id }
+            data = {
+                new: true,
+                place_id: this.props.navigation.state.params.place_id
+            };
         }
-        navigate('Agenda_Production', data)
+        navigate('Agenda_Production', data);
     }
 
     renderQuestions() {
-        const { navigate } = this.props.navigation
-        navigate('Agenda_Questions', this.state.place)
+        const { navigate } = this.props.navigation;
+        navigate('Agenda_Questions', this.state.place);
     }
 
     render() {
-        const { navigation } = this.props
+        const { navigation } = this.props;
 
         return (
             <ScrollView style={styles.container}>
@@ -152,12 +193,19 @@ export default class AgendaDetail extends Component {
                             <Text>Resumo da visita</Text>
                         </View>
                         <TextInput
-                            style={{ height: 60, borderColor: 'gray', borderWidth: 1 }}
-                            onChangeText={(resume) => this.setState({ resume })}
+                            style={{
+                                height: 60,
+                                borderColor: 'gray',
+                                borderWidth: 1
+                            }}
+                            onChangeText={resume => this.setState({ resume })}
                             value={this.state.resume}
                         />
                         <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity onPress={() => this._hideModal()} style={styles.buttonSave}>
+                            <TouchableOpacity
+                                onPress={() => this._hideModal()}
+                                style={styles.buttonSave}
+                            >
                                 <Text>Salvar</Text>
                             </TouchableOpacity>
                         </View>
@@ -165,34 +213,56 @@ export default class AgendaDetail extends Component {
                 </Modal>
                 <Card title={this.state.place.name}>
                     <View style={styles.title}>
-                        <Text style={styles.titleText}>
-                            DESCRIÇÃO VISITA
-                        </Text>
+                        <Text style={styles.titleText}>DESCRIÇÃO VISITA</Text>
                     </View>
                     <View style={styles.infos}>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Cliente: </Text> {this.state.place.client_name}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Cliente:{' '}
+                            </Text>{' '}
+                            {this.state.place.client_name}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Inscrição: </Text> {this.state.place.inscription}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Inscrição:{' '}
+                            </Text>{' '}
+                            {this.state.place.inscription}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Contato: </Text> {this.state.place.client_contact}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Contato:{' '}
+                            </Text>{' '}
+                            {this.state.place.client_contact}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Telefone: </Text> {this.state.place.client_phone}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Telefone:{' '}
+                            </Text>{' '}
+                            {this.state.place.client_phone}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Fazenda: </Text> {this.state.place.name}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Fazenda:{' '}
+                            </Text>{' '}
+                            {this.state.place.name}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Endereço: </Text> {this.state.place.address}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Endereço:{' '}
+                            </Text>{' '}
+                            {this.state.place.address}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Intinerário: </Text> {this.state.place.itinerary}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Intinerário:{' '}
+                            </Text>{' '}
+                            {this.state.place.itinerary}
                         </Text>
                         <Text style={styles.infosText}>
-                            <Text style={{ fontWeight: 'bold' }}>Cidade/UF: </Text> {this.state.place.city} - {this.state.place.state}
+                            <Text style={{ fontWeight: 'bold' }}>
+                                Cidade/UF:{' '}
+                            </Text>{' '}
+                            {this.state.place.city} - {this.state.place.state}
                         </Text>
                     </View>
                     <Graphic data={this.state.productions} />
@@ -201,25 +271,40 @@ export default class AgendaDetail extends Component {
                         onPress={() => this.renderProductionDetail()}
                     />
                 </Card>
-                {this.state.isLoading &&
+                {this.state.isLoading && (
                     <ActivityIndicator
-                        color='#338927'
+                        color="#338927"
                         size="large"
                         style={styles.activityIndicator}
                     />
-                }
+                )}
                 <Button
-                    icon={this.state.schedule.finished ? { name: 'ban', type: 'font-awesome' } : { name: 'cached' }}
-                    title={this.state.schedule.finished ? 'Finalizada' : this.state.schedule.start_travel ? 'Finalizar Visita' : 'Iniciar Visita'}
-                    backgroundColor={this.state.schedule.start_travel ? 'red' : 'green'}
-                    style={{ borderRadius: 4, borderColor: 'rgba(0, 0, 0, 0.1)' }}
+                    icon={
+                        this.state.schedule.finished
+                            ? { name: 'ban', type: 'font-awesome' }
+                            : { name: 'cached' }
+                    }
+                    title={
+                        this.state.schedule.finished
+                            ? 'Finalizada'
+                            : this.state.schedule.start_travel
+                                ? 'Finalizar Visita'
+                                : 'Iniciar Visita'
+                    }
+                    backgroundColor={
+                        this.state.schedule.start_travel ? 'red' : 'green'
+                    }
+                    style={{
+                        borderRadius: 4,
+                        borderColor: 'rgba(0, 0, 0, 0.1)'
+                    }}
                     onPress={() => this.getPosition()}
                 />
                 <Card>
                     <View>
                         <Button
-                            backgroundColor='lightblue'
-                            title='Questionário'
+                            backgroundColor="lightblue"
+                            title="Questionário"
                             onPress={() => this.renderQuestions()}
                         />
                     </View>
@@ -228,10 +313,13 @@ export default class AgendaDetail extends Component {
                     <View style={styles.title}>
                         <Text style={styles.titleText}>INFORMAÇÕES</Text>
                     </View>
-                    <ListProductions data={this.state.productions} onPress={(item) => this.renderProductionDetail(item)} />
+                    <ListProductions
+                        data={this.state.productions}
+                        onPress={item => this.renderProductionDetail(item)}
+                    />
                 </Card>
             </ScrollView>
-        )
+        );
     }
 }
 
@@ -241,7 +329,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     infos: {
-        paddingTop: 15,
+        paddingTop: 15
     },
     infosText: {
         paddingBottom: 5,
@@ -261,7 +349,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 4,
-        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderColor: 'rgba(0, 0, 0, 0.1)'
     },
     modalContent: {
         backgroundColor: 'white',
@@ -269,19 +357,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'stretch',
         borderRadius: 4,
-        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderColor: 'rgba(0, 0, 0, 0.1)'
     },
     titleModalContent: {
         alignItems: 'center'
     },
     bottomModal: {
         justifyContent: 'flex-end',
-        margin: 0,
+        margin: 0
     },
     actionButtonIcon: {
         fontSize: 20,
         height: 22,
-        color: 'white',
+        color: 'white'
     },
     buttonSave: {
         backgroundColor: 'green',
@@ -290,7 +378,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 4,
-        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderColor: 'rgba(0, 0, 0, 0.1)'
     },
     buttonCancel: {
         backgroundColor: 'lightgray',
@@ -299,7 +387,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 4,
-        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderColor: 'rgba(0, 0, 0, 0.1)'
     },
     loading: {
         position: 'absolute',
@@ -310,4 +398,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     }
-})
+});

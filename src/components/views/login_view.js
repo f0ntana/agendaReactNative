@@ -115,7 +115,7 @@ export default class LoginHome extends Component {
                             title="Entrar"
                             onPress={() => this.doLogin()}
                         />
-                        <Text style={styles.version}>Versão: 12</Text>
+                        <Text style={styles.version}>Versão: 13</Text>
                     </Card>
                 </Image>
             </KeyboardAwareScrollView>
