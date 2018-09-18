@@ -7,6 +7,7 @@ import Logout from './components/login/logout';
 import Fazenda from './components/places/places';
 import Agenda from './components/menu/agenda';
 import Sync from './components/sync/sync';
+import Carregamento from './components/carregamento';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -34,6 +35,7 @@ const MainDrawerNavigator = DrawerNavigator(
         Agenda: { screen: Agenda },
         Fazenda: { screen: Fazenda },
         Sync: { screen: Sync },
+        Carregamento: { screen: Carregamento },
         Logout: { screen: Logout }
     },
     {

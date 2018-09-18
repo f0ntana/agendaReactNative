@@ -1,9 +1,22 @@
 import { AsyncStorage } from 'react-native';
 
 const API_BASE = 'http://petrovina-crm.softsul.agr.br/api/';
-// const API_BASE = 'http://localhost:8000/api/'
+// const API_BASE = 'http://localhost:8000/api/';
 
 export const API = {
+    getCarregamentos() {
+        return AsyncStorage.getItem('_token').then(value => {
+            return fetch(API_BASE + 'carregamentos', {
+                method: 'get',
+                headers: {
+                    Authorization: 'Bearer ' + value,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+        });
+    },
+
     updateSyncProductions(payload) {
         let data = JSON.stringify(payload);
         return AsyncStorage.getItem('_token').then(value => {

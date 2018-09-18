@@ -27,12 +27,12 @@ public class MainApplication extends Application implements ReactApplication {
         @Override
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
-                    new MainReactPackage(),
-            new RNSharedPreferencesReactPackage(),
-                    new RealmReactPackage(),
-                    new VectorIconsPackage(),
-                    new SvgPackage(),
-                    new LocationPackage()
+                new MainReactPackage(),
+                new RNSharedPreferencesReactPackage(),
+                new RealmReactPackage(),
+                new VectorIconsPackage(),
+                new SvgPackage(),
+                new LocationPackage()
             );
         }
     };
